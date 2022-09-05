@@ -2,6 +2,10 @@
 
 #include "../include/yds_audio_buffer.h"
 
+#if defined(__GNUC__)
+    #include <cstring>
+#endif
+
 ysAudioFile::ysAudioFile() {
     m_format = AudioFormat::Undefined;
 

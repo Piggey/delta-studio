@@ -3,6 +3,10 @@
 #include "../include/yds_audio_source.h"
 #include "../include/yds_audio_file.h"
 
+#if defined(__GNUC__)
+    #include <cstring>
+#endif
+
 ysStreamingAudio::ysStreamingAudio() : ysObject("ysStreamingAudio") {
     m_file = nullptr;
     m_source = nullptr;

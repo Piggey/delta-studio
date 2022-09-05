@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(__GNUC__)
+    #define __forceinline __attribute__((always_inline))
+#endif
+
 // Extra Definitions
 
 #define _mm_replicate_x_ps(v) \
@@ -118,7 +122,11 @@ struct ysMatrix33 {
     };
 };
 
-#define YS_MATH_CONST extern const __declspec(selectany)
+#if defined(__GNUC__)
+    #define YS_MATH_CONST extern constexpr
+#elif defined(_MSC_VER)
+    #define YS_MATH_CONST extern const __declspec(selectany)
+#endif
 
 namespace ysMath {
 
@@ -201,23 +209,43 @@ namespace ysMath {
     ysVector3 GetVector3(const ysVector &v);
     ysVector2 GetVector2(const ysVector &v);
     __forceinline float GetScalar(const ysVector &v) {
+#if defined(__GNUC__)
+        return v[0];
+#elif defined(_MSC_VER)
         return v.m128_f32[0];
+#endif
     }
 
     __forceinline float GetX(const ysVector &v) {
+#if defined(__GNUC__)
+        return v[0];
+#elif defined(_MSC_VER)
         return v.m128_f32[0];
+#endif
     }
 
     __forceinline float GetY(const ysVector &v) {
+#if defined(__GNUC__)
+        return v[1];
+#elif defined(_MSC_VER)
         return v.m128_f32[1];
+#endif
     }
 
     __forceinline float GetZ(const ysVector &v) {
+#if defined(__GNUC__)
+        return v[2];
+#elif defined(_MSC_VER)
         return v.m128_f32[2];
+#endif
     }
 
     __forceinline float GetW(const ysVector &v) {
+#if defined(__GNUC__)
+        return v[3];
+#elif defined(_MSC_VER)
         return v.m128_f32[3];
+#endif
     }
 
     float GetQuatX(const ysQuaternion &v);
