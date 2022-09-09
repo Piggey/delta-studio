@@ -1,4 +1,4 @@
-#include "yds_al_audio_buffer.h"
+#include "../include/yds_al_audio_buffer.h"
 
 ysALAudioBuffer::ysALAudioBuffer() : ysAudioBuffer(API::OpenAL) {
     m_buffer = nullptr;

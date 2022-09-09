@@ -1,4 +1,4 @@
-#include "yds_al_system.h"
+#include "../include/yds_al_system.h"
 
 ysALSystem::ysALSystem() : ysAudioSystem(API::OpenAL) {
 

@@ -1,4 +1,4 @@
-#include "yds_al_audio_source.h"
+#include "../include/yds_al_audio_source.h"
 
 ysALAudioSource::ysALAudioSource() : ysAudioSource(API::OpenAL) {
     alGenBuffers(1, &m_buffer);
