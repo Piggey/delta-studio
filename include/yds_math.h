@@ -7,7 +7,9 @@
 #include <string.h>
 
 #if defined(__GNUC__)
-    #define __forceinline __attribute__((always_inline))
+    #ifndef __forceinline
+        #define __forceinline inline
+    #endif
 #endif
 
 // Extra Definitions

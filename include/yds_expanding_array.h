@@ -3,8 +3,14 @@
 
 #include "yds_allocator.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <new>
+
+#if defined(__GNUC__)
+    #ifndef __forceinline
+        #define __forceinline inline
+    #endif
+#endif
 
 template<typename TYPE, int START_SIZE = 0, int ALIGNMENT = 1>
 class ysExpandingArray {
