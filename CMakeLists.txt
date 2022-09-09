@@ -15,6 +15,7 @@ else()
     set(TARGET_ARCHITECTURE x86)
 endif()
 
+
 # =========================================================
 # D3DX
 
@@ -64,9 +65,10 @@ find_package(Boost 1.40 COMPONENTS filesystem REQUIRED)
 # =========================================================
 # STB
 
+
 include_directories(dependencies/libraries/stb)
 
-add_library(delta-core STATIC
+set(DELTA_CORE_SOURCE_FILES
     # Source files
     src/yds_animation_action.cpp
     src/yds_animation_action_binding.cpp
@@ -90,29 +92,8 @@ add_library(delta-core STATIC
     src/yds_breakdown_timer_channel.cpp
     src/yds_color.cpp
     src/yds_context_object.cpp
-    src/yds_d3d10_context.cpp
-    src/yds_d3d10_device.cpp
-    src/yds_d3d10_gpu_buffer.cpp
-    src/yds_d3d10_input_layout.cpp
-    src/yds_d3d10_render_target.cpp
-    src/yds_d3d10_shader.cpp
-    src/yds_d3d10_shader_program.cpp
-    src/yds_d3d10_texture.cpp
-    src/yds_d3d11_context.cpp
-    src/yds_d3d11_device.cpp
-    src/yds_d3d11_gpu_buffer.cpp
-    src/yds_d3d11_input_layout.cpp
-    src/yds_d3d11_render_target.cpp
-    src/yds_d3d11_shader.cpp
-    src/yds_d3d11_shader_program.cpp
-    src/yds_d3d11_texture.cpp
-    src/yds_d3d11_utilities.cpp
     src/yds_depth_buffer.cpp
     src/yds_device.cpp
-    src/yds_ds8_audio_buffer.cpp
-    src/yds_ds8_audio_source.cpp
-    src/yds_ds8_device.cpp
-    src/yds_ds8_system.cpp
     src/yds_dynamic_allocator.cpp
     src/yds_error_handler.cpp
     src/yds_error_system.cpp
@@ -161,23 +142,7 @@ add_library(delta-core STATIC
     src/yds_tool_animation_file.cpp
     src/yds_tool_geometry_file.cpp
     src/yds_transform.cpp
-    src/yds_vulkan_context.cpp
-    src/yds_vulkan_device.cpp
-    src/yds_vulkan_gpu_buffer.cpp
-    src/yds_vulkan_input_layout.cpp
-    src/yds_vulkan_render_target.cpp
-    src/yds_vulkan_shader.cpp
-    src/yds_vulkan_shader_program.cpp
-    src/yds_vulkan_texture.cpp
-    src/yds_vulkan_windows_context.cpp
     src/yds_window.cpp
-    src/yds_windows_audio_wave_file.cpp
-    src/yds_windows_input_device.cpp
-    src/yds_windows_input_system.cpp
-    src/yds_windows_key_maps.cpp
-    src/yds_windows_monitor.cpp
-    src/yds_windows_window.cpp
-    src/yds_windows_window_system.cpp
     src/yds_window_event_handler.cpp
     src/yds_window_system.cpp
     src/yds_window_system_object.cpp
@@ -207,29 +172,8 @@ add_library(delta-core STATIC
     include/yds_color.h
     include/yds_context_object.h
     include/yds_core.h
-    include/yds_d3d10_context.h
-    include/yds_d3d10_device.h
-    include/yds_d3d10_gpu_buffer.h
-    include/yds_d3d10_input_layout.h
-    include/yds_d3d10_render_target.h
-    include/yds_d3d10_shader.h
-    include/yds_d3d10_shader_program.h
-    include/yds_d3d10_texture.h
-    include/yds_d3d11_context.h
-    include/yds_d3d11_device.h
-    include/yds_d3d11_gpu_buffer.h
-    include/yds_d3d11_input_layout.h
-    include/yds_d3d11_render_target.h
-    include/yds_d3d11_shader.h
-    include/yds_d3d11_shader_program.h
-    include/yds_d3d11_texture.h
-    include/yds_d3d11_utilities.h
     include/yds_depth_buffer.h
     include/yds_device.h
-    include/yds_ds8_audio_buffer.h
-    include/yds_ds8_audio_source.h
-    include/yds_ds8_device.h
-    include/yds_ds8_system.h
     include/yds_dynamic_allocator.h
     include/yds_dynamic_array.h
     include/yds_dynamic_array_deprecated.h
@@ -287,6 +231,13 @@ add_library(delta-core STATIC
     include/yds_tool_animation_file.h
     include/yds_tool_geometry_file.h
     include/yds_transform.h
+    include/yds_window.h
+    include/yds_window_event_handler.h
+    include/yds_window_system.h
+    include/yds_window_system_object.h
+)
+
+set(LINUX_SUPPORT_SOON_TM
     include/yds_vulkan.h
     include/yds_vulkan_context.h
     include/yds_vulkan_decl.h
@@ -298,18 +249,81 @@ add_library(delta-core STATIC
     include/yds_vulkan_shader_program.h
     include/yds_vulkan_texture.h
     include/yds_vulkan_windows_context.h
-    include/yds_window.h
-    include/yds_windows_audio_wave_file.h
-    include/yds_windows_input_device.h
-    include/yds_windows_input_system.h
-    include/yds_windows_monitor.h
-    include/yds_windows_window.h
-    include/yds_windows_window_system.h
-    include/yds_window_event_handler.h
-    include/yds_window_system.h
-    include/yds_window_system_object.h
+
+    src/yds_vulkan_context.cpp
+    src/yds_vulkan_device.cpp
+    src/yds_vulkan_gpu_buffer.cpp
+    src/yds_vulkan_input_layout.cpp
+    src/yds_vulkan_render_target.cpp
+    src/yds_vulkan_shader.cpp
+    src/yds_vulkan_shader_program.cpp
+    src/yds_vulkan_texture.cpp
+    src/yds_vulkan_windows_context.cpp
 )
 
+# platform specific libraries and stuff
+if(UNIX)
+    find_package(OpenAL REQUIRED) # instead of DirectSound library
+
+    # use system's OpenGL library
+    if (POLICY CMP0072)
+        cmake_policy(SET CMP0072 NEW)
+    endif ()
+    find_package(OpenGL REQUIRED)
+
+    # DXVK replacement for D3D10?
+    set(DELTA_CORE_SOURCE_FILES_LINUX
+            include/yds_unix_defs.h
+            include/yds_al_system.h src/yds_al_system.cpp
+            include/yds_al_device.h src/yds_al_device.cpp
+            include/yds_al_audio_buffer.h src/yds_al_audio_buffer.cpp
+            include/yds_al_audio_source.h src/yds_al_audio_source.cpp
+    )
+
+    # set(DELTA_CORE_SOURCE_FILES ${DELTA_CORE_SOURCE_FILES} ${DELTA_CORE_SOURCE_FILES_LINUX})
+elseif(WIN32)
+    set(DELTA_CORE_SOURCE_FILES_WINDOWS
+            # DirectSound
+            include/yds_ds8_audio_buffer.h src/yds_ds8_audio_buffer.cpp
+            include/yds_ds8_audio_source.h src/yds_ds8_audio_source.cpp
+            include/yds_ds8_device.h src/yds_ds8_device.cpp
+            include/yds_ds8_system.h src/yds_ds8_system.cpp
+
+            # Direct3D 10
+            include/yds_d3d10_context.h src/yds_d3d10_context.cpp
+            include/yds_d3d10_device.h src/yds_d3d10_device.cpp
+            include/yds_d3d10_gpu_buffer.h src/yds_d3d10_gpu_buffer.cpp
+            include/yds_d3d10_input_layout.h src/yds_d3d10_input_layout.cpp
+            include/yds_d3d10_render_target.h src/yds_d3d10_render_target.cpp
+            include/yds_d3d10_shader.h src/yds_d3d10_shader.cpp
+            include/yds_d3d10_shader_program.h src/yds_d3d10_shader_program.cpp
+            include/yds_d3d10_texture.h src/yds_d3d10_texture.cpp
+
+            # Direct3D 11
+            include/yds_d3d11_context.h src/yds_d3d11_context.cpp
+            include/yds_d3d11_device.h src/yds_d3d11_device.cpp
+            include/yds_d3d11_gpu_buffer.h src/yds_d3d11_gpu_buffer.cpp
+            include/yds_d3d11_input_layout.h src/yds_d3d11_input_layout.cpp
+            include/yds_d3d11_render_target.h src/yds_d3d11_render_target.cpp
+            include/yds_d3d11_shader.h src/yds_d3d11_shader.cpp
+            include/yds_d3d11_shader_program.h src/yds_d3d11_shader_program.cpp
+            include/yds_d3d11_texture.h src/yds_d3d11_texture.cpp
+            include/yds_d3d11_utilities.h src/yds_d3d11_utilities.cpp
+
+            # Windows API stuff
+            include/yds_windows_audio_wave_file.h src/yds_windows_audio_wave_file.cpp
+            include/yds_windows_input_device.h src/yds_windows_input_device.cpp
+            include/yds_windows_input_system.h src/yds_windows_input_system.cpp
+            include/yds_windows_monitor.h src/yds_windows_monitor.cpp
+            include/yds_windows_window.h src/yds_windows_window.cpp
+            include/yds_windows_window_system.h src/yds_windows_window_system.cpp
+            src/yds_windows_key_maps.cpp
+    )
+
+    set(DELTA_CORE_SOURCE_FILES ${DELTA_CORE_SOURCE_FILES} ${DELTA_CORE_SOURCE_FILES_WINDOWS})
+endif()
+
+add_library(delta-core STATIC ${DELTA_CORE_SOURCE_FILES})
 
 target_link_libraries(delta-core PUBLIC
     # SDL
