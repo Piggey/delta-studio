@@ -23,7 +23,7 @@ public:
     struct ObjectInformation_000_002 {
         int ModelIndex;
         int ParentIndex;
-        ysObjectData::ObjectType ObjectType;
+        ysObjectData::ObjectTypes ObjectType;
         int UsesBones;
     };
 
@@ -31,7 +31,7 @@ public:
         int ModelIndex;
         int ParentIndex;
         int ParentInstance;
-        ysObjectData::ObjectType ObjectType;
+        ysObjectData::ObjectTypes ObjectType;
         int UsesBones;
     };
 
@@ -39,7 +39,7 @@ public:
         int ModelIndex;
         int ParentIndex;
         int ParentInstance;
-        ysObjectData::ObjectType ObjectType;
+        ysObjectData::ObjectTypes ObjectType;
         int UsesBones;
         int SkeletonIndex;
     };

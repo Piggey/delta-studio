@@ -58,7 +58,7 @@ void delta_demo::DeltaBasicDemoApplication::Initialize(void *instance, ysContext
     m_assetManager.ResolveNodeHierarchy();
 
     dbasic::SceneObjectAsset *root = m_assetManager.GetSceneObject(
-        "Armature", ysObjectData::ObjectType::Empty);
+        "Armature", ysObjectData::ObjectTypes::Empty);
     m_renderSkeleton = m_assetManager.BuildRenderSkeleton(&m_skeletonBase, root);
     m_skeletonBase.SetPosition(ysMath::LoadVector(0.0f, 0.0f, 0.0f));
 

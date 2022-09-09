@@ -3,6 +3,8 @@
 #include "../include/animation_export_file.h"
 #include "../include/delta_engine.h"
 
+#include "../../../../include/yds_unix_defs.h"
+
 #include <set>
 #include <sys/stat.h>
 
@@ -49,7 +51,7 @@ dbasic::SceneObjectAsset *dbasic::AssetManager::NewSceneObject() {
     return newObject;
 }
 
-dbasic::SceneObjectAsset *dbasic::AssetManager::GetSceneObject(const char *name, ysObjectData::ObjectType type) {
+dbasic::SceneObjectAsset *dbasic::AssetManager::GetSceneObject(const char *name, ysObjectData::ObjectTypes type) {
     const int objectCount = m_sceneObjects.GetNumObjects();
     for (int i = 0; i < objectCount; i++) {
         if (m_sceneObjects.Get(i)->GetType() != type) {
@@ -127,7 +129,7 @@ ysError dbasic::AssetManager::CompileSceneFile(const char *fname, float scale, b
         YDS_NESTED_ERROR_CALL(toolFile.ReadObject(&objects[i]));
         Material *material = FindMaterial(objects[i]->m_materialName);
 
-        if (objects[i]->m_objectInformation.ObjectType == ysObjectData::ObjectType::Geometry) {
+        if (objects[i]->m_objectInformation.ObjectType == ysObjectData::ObjectTypes::Geometry) {
             ysGeometryPreprocessing::ResolveSmoothingGroupAmbiguity(objects[i]);
             ysGeometryPreprocessing::CreateAutomaticSmoothingGroups(objects[i]);
             ysGeometryPreprocessing::SeparateBySmoothingGroups(objects[i]);
@@ -269,15 +271,15 @@ ysError dbasic::AssetManager::LoadSceneFile(const char *fname, bool placeInVram)
 
         SceneObjectAsset *newObject = NewSceneObject();
 
-        ysObjectData::ObjectType objectType = static_cast<ysObjectData::ObjectType>(header.ObjectType);
-        if (objectType == ysObjectData::ObjectType::Bone ||
-            objectType == ysObjectData::ObjectType::Group ||
-            objectType == ysObjectData::ObjectType::Plane ||
-            objectType == ysObjectData::ObjectType::Instance ||
-            objectType == ysObjectData::ObjectType::Empty ||
-            objectType == ysObjectData::ObjectType::Light) 
+        ysObjectData::ObjectTypes objectType = static_cast<ysObjectData::ObjectTypes>(header.ObjectType);
+        if (objectType == ysObjectData::ObjectTypes::Bone ||
+            objectType == ysObjectData::ObjectTypes::Group ||
+            objectType == ysObjectData::ObjectTypes::Plane ||
+            objectType == ysObjectData::ObjectTypes::Instance ||
+            objectType == ysObjectData::ObjectTypes::Empty ||
+            objectType == ysObjectData::ObjectTypes::Light) 
         {
-            if (objectType == ysObjectData::ObjectType::Light) {
+            if (objectType == ysObjectData::ObjectTypes::Light) {
                 lights.insert(i);
             }
 
@@ -314,10 +316,10 @@ ysError dbasic::AssetManager::LoadSceneFile(const char *fname, bool placeInVram)
             newObject->m_localOrientation = ysMath::LoadVector(header.Orientation);
             newObject->m_localPosition = translation;
 
-            if (objectType == ysObjectData::ObjectType::Plane) {
+            if (objectType == ysObjectData::ObjectTypes::Plane) {
                 return YDS_ERROR_RETURN_MSG(ysError::UnsupportedType, "Planes not supported.");
             }
-            else if (objectType == ysObjectData::ObjectType::Instance) {
+            else if (objectType == ysObjectData::ObjectTypes::Instance) {
                 if (modelIndexMap.count(header.ParentInstanceIndex) == 1) {
                     newObject->m_geometry = GetModelAsset(modelIndexMap[header.ParentInstanceIndex]);
                 }
@@ -329,7 +331,7 @@ ysError dbasic::AssetManager::LoadSceneFile(const char *fname, bool placeInVram)
                     newObject->SetInstance(GetSceneObject(header.ParentInstanceIndex));
                 }
             }
-            else if (objectType == ysObjectData::ObjectType::Light) {
+            else if (objectType == ysObjectData::ObjectTypes::Light) {
                 ysInterchangeObject::Light lightInformation;
                 file.read((char *)&lightInformation, sizeof(ysInterchangeObject::Light));
 
@@ -343,7 +345,7 @@ ysError dbasic::AssetManager::LoadSceneFile(const char *fname, bool placeInVram)
                 newObject->GetLightInformation().SpotFade = lightInformation.SpotFade;
             }
         }
-        else if (objectType == ysObjectData::ObjectType::Geometry) {
+        else if (objectType == ysObjectData::ObjectTypes::Geometry) {
             modelIndexMap[i] = m_modelAssets.GetNumObjects();
 
             // New model asset
@@ -371,7 +373,7 @@ ysError dbasic::AssetManager::LoadSceneFile(const char *fname, bool placeInVram)
             }
 
             newObject->m_parent = (header.ParentIndex < 0) ? -1 : header.ParentIndex + initialIndex;
-            newObject->m_type = ysObjectData::ObjectType::Geometry;
+            newObject->m_type = ysObjectData::ObjectTypes::Geometry;
 
             newModelAsset->m_vertexSize = stride;
             newModelAsset->m_UVChannelCount = header.NumUVChannels;
@@ -544,7 +546,7 @@ dbasic::TextureAsset *dbasic::AssetManager::GetTexture(const char *name) {
 ysError dbasic::AssetManager::LoadAudioFile(const char *fname, const char *name) {
     YDS_ERROR_DECLARE("LoadAudioFile");
 
-    ysWindowsAudioWaveFile waveFile;
+    ysAudioFile waveFile;
     waveFile.OpenFile(fname);
 
     ysAudioBuffer *newBuffer = m_engine->GetAudioDevice()->CreateBuffer(
@@ -586,14 +588,14 @@ dbasic::Skeleton *dbasic::AssetManager::BuildSkeleton(ModelAsset *model) {
     int nSceneObjects = GetSceneObjectCount();
     for (int i = 0; i < nSceneObjects; i++) {
         SceneObjectAsset *asset = GetSceneObject(i);
-        if (GetRoot(asset) == rootBoneReference && asset->GetType() == ysObjectData::ObjectType::Bone) {
+        if (GetRoot(asset) == rootBoneReference && asset->GetType() == ysObjectData::ObjectTypes::Bone) {
             newSkeleton->NewBone();
         }
     }
 
     for (int i = 0; i < nSceneObjects; i++) {
         SceneObjectAsset *asset = GetSceneObject(i);
-        if (GetRoot(asset) == rootBoneReference && asset->GetType() == ysObjectData::ObjectType::Bone) {
+        if (GetRoot(asset) == rootBoneReference && asset->GetType() == ysObjectData::ObjectTypes::Bone) {
             boneReference = GetSceneObject(i);
 
             bone = newSkeleton->GetBone(boneReference->m_skeletonIndex);
@@ -647,7 +649,7 @@ dbasic::RenderSkeleton *dbasic::AssetManager::BuildRenderSkeleton(ysTransform *r
     newNode->SetModelAsset(rootBone->m_geometry);
     newNode->SetSceneAsset(rootBone);
     newNode->SetName(rootBone->m_name);
-    newNode->SetBone(rootBone->GetType() == ysObjectData::ObjectType::Bone);
+    newNode->SetBone(rootBone->GetType() == ysObjectData::ObjectTypes::Bone);
 
     newNode->SetRestLocation(rootBone->GetPosition());
     newNode->SetRestOrientation(rootBone->GetLocalOrientation());
@@ -674,14 +676,14 @@ void dbasic::AssetManager::ProcessRenderNode(SceneObjectAsset *object, RenderSke
         newNode->Transform.SetPosition(object->GetPosition());
         newNode->SetModelAsset(object->m_geometry);
         newNode->SetName(object->m_name);
-        newNode->SetBone(object->GetType() == ysObjectData::ObjectType::Bone);
+        newNode->SetBone(object->GetType() == ysObjectData::ObjectTypes::Bone);
         newNode->SetSceneAsset(object);
 
         newNode->SetRestLocation(object->GetPosition());
         newNode->SetRestOrientation(object->GetLocalOrientation());
     }
 
-    if (object->GetType() == ysObjectData::ObjectType::Instance) {
+    if (object->GetType() == ysObjectData::ObjectTypes::Instance) {
         ProcessRenderNode(object->GetInstance(), skeleton, newNode, top);
     }
 

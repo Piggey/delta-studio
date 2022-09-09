@@ -3,6 +3,8 @@
 
 #include "delta_core.h"
 
+#include "../../../../include/yds_unix_defs.h"
+
 namespace dbasic {
 
     class ModelAsset;
@@ -46,7 +48,7 @@ namespace dbasic {
 
         int GetParent() const { return m_parent; }
 
-        ysObjectData::ObjectType GetType() const { return m_type; }
+        ysObjectData::ObjectTypes GetType() const { return m_type; }
 
         void AddChild(int index) { m_children.New() = index; }
         int GetChild(int index) { return m_children[index]; }
@@ -66,7 +68,7 @@ namespace dbasic {
         char m_name[64];
         int m_parent;
         int m_skeletonIndex;
-        ysObjectData::ObjectType m_type;
+        ysObjectData::ObjectTypes m_type;
         LightInformation m_lightInformation;
 
         SceneObjectAsset *m_instance;

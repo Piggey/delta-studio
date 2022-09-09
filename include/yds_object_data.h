@@ -7,7 +7,7 @@
 
 class ysObjectData {
 public:
-    enum class ObjectType {
+    enum class ObjectTypes {
         Geometry,
         Bone,
         Group,
@@ -82,7 +82,7 @@ public:
         int ModelIndex;
         int ParentIndex;
         int ParentInstance;
-        ObjectType ObjectType;
+        ObjectTypes ObjectType;
         int UsesBones;
         int SkeletonIndex;
     } m_objectInformation;
