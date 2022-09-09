@@ -324,14 +324,16 @@ ysError dbasic::DeltaEngine::InitializeGeometry() {
     YDS_ERROR_DECLARE("InitializeGeometry");
 
     Vertex vertexData[] = {
-        { { -1.0f, 1.0f, 0.0f, 1.0f },  {0.0f, 1.0f},    {0.0f, 0.0f, 1.0f, 0.0f} },
-        { { 1.0f, 1.0f, 0.0f, 1.0f },   {1.0f, 1.0f},    {0.0f, 0.0f, 1.0f, 0.0f} },
-        { { 1.0f, -1.0f, 0.0f, 1.0f },  {1.0f, 0.0f},    {0.0f, 0.0f, 1.0f, 0.0f} },
-        { { -1.0f, -1.0f, 0.0f, 1.0f }, {0.0f, 0.0f},    {0.0f, 0.0f, 1.0f, 0.0f} } };
+        { { -1.0f,  1.0f,  0.0f,  1.0f },   {0.0f, 1.0f},    {0.0f, 0.0f, 1.0f, 0.0f} },
+        { {  1.0f,  1.0f,  0.0f,  1.0f },   {1.0f, 1.0f},    {0.0f, 0.0f, 1.0f, 0.0f} },
+        { {  1.0f, -1.0f,  0.0f,  1.0f },   {1.0f, 0.0f},    {0.0f, 0.0f, 1.0f, 0.0f} },
+        { { -1.0f, -1.0f,  0.0f,  1.0f },   {0.0f, 0.0f},    {0.0f, 0.0f, 1.0f, 0.0f} } 
+    };
 
     unsigned short indices[] = {
         2, 1, 0,
-        3, 2, 0 };
+        3, 2, 0 
+    };
 
     YDS_NESTED_ERROR_CALL(m_device->CreateVertexBuffer(&m_mainVertexBuffer, sizeof(vertexData), (char *)vertexData));
     YDS_NESTED_ERROR_CALL(m_device->CreateIndexBuffer(&m_mainIndexBuffer, sizeof(indices), (char *)indices));
@@ -343,41 +345,40 @@ ysError dbasic::DeltaEngine::InitializeShaders(const char *shaderDirectory) {
     YDS_ERROR_DECLARE("InitializeShaders");
 
     char buffer[256];
-
     if (m_device->GetAPI() == ysContextObject::DeviceAPI::DirectX11 ||
         m_device->GetAPI() == ysContextObject::DeviceAPI::DirectX10)
     {
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/hlsl/delta_engine_shader.fx");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/hlsl/delta_engine_shader.fx");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_vertexShader, buffer, "VS_STANDARD")); 
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_vertexSkinnedShader, buffer, "VS_SKINNED"));
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_pixelShader, buffer, "PS"));
 
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/hlsl/delta_console_shader.fx");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/hlsl/delta_console_shader.fx");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_consoleVertexShader, buffer, "VS_CONSOLE"));
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_consolePixelShader, buffer, "PS_CONSOLE"));
 
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/hlsl/delta_saq_shader.fx");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/hlsl/delta_saq_shader.fx");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_saqVertexShader, buffer, "VS_SAQ"));
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_saqPixelShader, buffer, "PS_SAQ"));
     }
     else if (m_device->GetAPI() == ysContextObject::DeviceAPI::OpenGL4_0) {
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/glsl/delta_engine_shader.vert");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_engine_shader.vert");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_vertexShader, buffer, "VS"));
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_vertexSkinnedShader, buffer, "VS"));
 
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/glsl/delta_engine_shader.frag");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_engine_shader.frag");
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_pixelShader, buffer, "PS"));
 
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/glsl/delta_console_shader.vert");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_console_shader.vert");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_consoleVertexShader, buffer, "VS"));
 
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/glsl/delta_console_shader.frag");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_console_shader.frag");
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_consolePixelShader, buffer, "PS"));
 
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/glsl/delta_saq_shader.vert");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_saq_shader.vert");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_saqVertexShader, buffer, "VS"));
 
-        sprintf_s(buffer, "%s%s", shaderDirectory, "/glsl/delta_saq_shader.frag");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_saq_shader.frag");
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_saqPixelShader, buffer, "PS"));
     }
 

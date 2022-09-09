@@ -9,6 +9,9 @@ namespace dbasic {
         ysVector4 Pos = { 0.0f, 0.0f, 0.0f, 0.0f };
         ysVector2 TexCoord = { 0.0f, 0.0f };
         ysVector4 Normal = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+        Vertex(ysVector4 pos, ysVector2 texCoord, ysVector4 normal) 
+            : Pos(pos), TexCoord(texCoord), Normal(normal) {}
     };
 
     struct ConsoleVertex {
