@@ -1,5 +1,7 @@
 #include "../include/yds_input_device.h"
 
+#include "../../../include/yds_unix_defs.h"
+
 ysInputDevice::ysInputDevice() : ysWindowSystemObject("INPUT DEVICE", Platform::Unknown) {
     SetName("");
 

@@ -1,6 +1,8 @@
 #include "../include/material.h"
 
-#include <string.h>
+#include "../../../include/yds_unix_defs.h"
+
+#include <cstring>
 
 dbasic::Material::Material() : ysObject("Material") {
     m_name[0] = '\0';

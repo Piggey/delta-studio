@@ -3,6 +3,8 @@
 #include "../include/yds_window_event_handler.h"
 #include "../include/yds_window_system.h"
 
+#include "../include/yds_unix_defs.h"
+
 #include <cmath>
 
 ysWindow::ysWindow() : ysWindowSystemObject("WINDOW", Platform::Unknown) {

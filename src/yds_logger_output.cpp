@@ -1,7 +1,13 @@
 #include "../include/yds_logger_output.h"
 #include "../include/yds_logger.h"
 
-#include <time.h>
+#include "../include/yds_unix_defs.h"
+
+#include <ctime>
+
+#if defined(__GNUC__)
+    #include <cstdio>
+#endif
 
 ysLoggerOutput::ysLoggerOutput() : ysObject("ysLoggerOutput") {
     m_level = -1;

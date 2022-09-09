@@ -1,4 +1,5 @@
 #include "../include/yds_render_geometry_format.h"
+#include "../include/yds_unix_defs.h"
 
 ysRenderGeometryFormat::ysRenderGeometryFormat() : ysObject("RENDER_GEOMETRY_FORMAT") {
     m_formatSize = 0;

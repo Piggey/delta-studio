@@ -1,5 +1,7 @@
 #include "../include/animation_group.h"
 
+#include "../../../include/yds_unix_defs.h"
+
 dbasic::AnimationGroup::AnimationGroup() : ysObject("AnimationGroup") {
     m_name[0] = '\0';
 }

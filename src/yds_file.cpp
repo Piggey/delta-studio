@@ -1,5 +1,7 @@
 #include "../include/yds_file.h"
 
+#include "../include/yds_unix_defs.h"
+
 ysFile::ysFile() : ysObject("FILE") {
     m_name[0] = '\0';
 }
@@ -19,13 +21,13 @@ ysError ysFile::OpenFile(const char *fname, unsigned int filemode) {
 
     strcpy_s(m_name, MAX_FILE_NAME_LENGTH, fname);
 
-    unsigned int openMode=0;
-    if (filemode & FILE_READ) openMode |= std::ios::in;
-    else openMode |= std::ios::out;
-
+    std::ios::openmode openMode;
+    if (filemode & FILE_READ)   openMode |= std::ios::in;
+    else                        openMode |= std::ios::out;
     if (filemode & FILE_BINARY) openMode |= std::ios::binary;
 
     m_file.open(fname, openMode);
+
     if (!m_file.is_open()) {
         return YDS_ERROR_RETURN(ysError::CouldNotOpenFile);
     }

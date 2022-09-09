@@ -1,5 +1,7 @@
 #include "../include/yds_monitor.h"
 
+#include "../include/yds_unix_defs.h"
+
 #include <cmath>
 
 ysMonitor::ysMonitor() : ysWindowSystemObject("DISPLAY_MONITOR", Platform::Windows) {

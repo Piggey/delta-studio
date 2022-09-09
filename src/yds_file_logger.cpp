@@ -1,5 +1,7 @@
 #include "../include/yds_file_logger.h"
 
+#include "../include/yds_unix_defs.h"
+
 ysFileLogger::ysFileLogger() : ysLoggerOutput("ysFileLogger") {
     /* void */
 }

@@ -5,6 +5,8 @@
 
 #include "../../../physics/include/rigid_body.h"
 
+#include "../../../../include/yds_unix_defs.h"
+
 namespace dbasic {
 
     class Skeleton;

@@ -1,5 +1,7 @@
 #include "../include/animation_export_data.h"
 
+#include "../../../include/yds_unix_defs.h"
+
 dbasic::AnimationExportData::AnimationExportData() : ysObject("AnimationExportData") {
     Clear();
 }
@@ -39,7 +41,7 @@ dbasic::PoseExport *dbasic::AnimationExportData::AddPose(char *name, int frame) 
 
     newPose->m_frame = frame + m_referenceFrame;
     strcpy_s(newPose->m_name, 64, name);
-
+    
     return newPose;
 }
 

@@ -1,6 +1,11 @@
 #include "../include/yds_geometry_export_file.h"
+#include "../include/yds_unix_defs.h"
 
-#include <math.h>
+#include <cmath>
+
+#if defined(__GNUC__)
+    #include <cfloat>
+#endif
 
 ysGeometryExportFile::ysGeometryExportFile() : ysObject("ysGeometryExportFile") {
     /* void */
@@ -56,7 +61,7 @@ void ysGeometryExportFile::FillOutputHeader(ysObjectData* object, ObjectOutputHe
     if (object->m_objectStatistics.NumUVChannels)    header->Flags |= MDF_TEXTURE_DATA;
 
     float minx = FLT_MAX, miny = FLT_MAX, minz = FLT_MAX, maxx = -FLT_MAX, maxy = -FLT_MAX, maxz = -FLT_MAX;
-    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Geometry) {
+    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectTypes::Geometry) {
         for (int vert = 0; vert < object->m_objectStatistics.NumVertices; vert++) {
             const ysVector3 vertex = object->m_vertices[vert];
             if (vertex.x > maxx) maxx = vertex.x;
@@ -405,7 +410,7 @@ ysError ysGeometryExportFile::WriteObject(ysObjectData *object) {
     void *vertexData = nullptr;
     int vertexDataSize = 0;
 
-    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Geometry) {
+    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectTypes::Geometry) {
         vertexDataSize = PackVertexData(object, 4 /* TEMP */, &vertexData);
         header.VertexDataSize = vertexDataSize;
     }
@@ -413,7 +418,7 @@ ysError ysGeometryExportFile::WriteObject(ysObjectData *object) {
     m_file.write((char *)&header, sizeof(ObjectOutputHeader));
 
     // Geometry Data
-    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Geometry) {
+    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectTypes::Geometry) {
         m_file.write((char *)vertexData, vertexDataSize);
 
         for (int i  =0; i < object->m_objectStatistics.NumFaces; ++i) {
@@ -431,7 +436,7 @@ ysError ysGeometryExportFile::WriteObject(ysObjectData *object) {
     }
 
     // Primitive Data
-    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Plane) {
+    if (object->m_objectInformation.ObjectType == ysObjectData::ObjectTypes::Plane) {
         m_file.write((char *)&object->m_length, sizeof(float));
         m_file.write((char *)&object->m_width, sizeof(float));
     }

@@ -1,5 +1,7 @@
 #include "../include/animation_export_file.h"
 
+#include "../../../include/yds_unix_defs.h"
+
 dbasic::AnimationExportFile::AnimationExportFile() : ysObject("ysAnimationExportFile") {
     m_openMode = Mode::Closed;
     m_fileVersion = -1;

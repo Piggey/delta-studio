@@ -1,6 +1,12 @@
 #include "../include/yds_logger.h"
 
-#include <stdarg.h>
+#include "../include/yds_unix_defs.h"
+
+#include <cstdarg>
+
+#if defined(__GNUC__)
+    #include <cstdio>
+#endif
 
 ysLogger *ysLogger::g_instance = NULL;
 
@@ -59,12 +65,21 @@ void ysLogger::End() {
 }
 
 ysLoggerMessageLevel::ysLoggerMessageLevel() {
+#if defined(_MSC_VER)
     ysLoggerMessageLevel::ysLoggerMessageLevel("", -1);
+#else
+    strcpy(m_name, "");
+#endif
     m_valid = false;
+    m_level = -1;
 }
 
 ysLoggerMessageLevel::ysLoggerMessageLevel(const char *name, int level) {
+#if defined(_MSC_VER)
     strcpy_s(m_name, 256, name);
+#else
+    strncpy(m_name, name, 256);
+#endif
     m_level = level;
     m_valid = true;
 }
