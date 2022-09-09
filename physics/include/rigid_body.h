@@ -30,8 +30,8 @@ namespace dphysics {
         ~RigidBody();
 
         // Interfaces
-        CollisionGeometry CollisionGeometry;
-        ysTransform Transform;
+        CollisionGeometry collisionGeometry;
+        ysTransform transform;
 
         void Integrate(float timeStep);
         void UpdateDerivedData(bool force = false);

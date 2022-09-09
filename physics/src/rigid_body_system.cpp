@@ -1,9 +1,7 @@
 #include "../include/rigid_body_system.h"
 
-#include <process.h>
-#include <Windows.h>
 #include <ctime>
-#include <assert.h>
+#include <cassert>
 
 float dphysics::RigidBodySystem::ResolutionPenetrationEpsilon = 1e-4f;
 
@@ -185,14 +183,14 @@ void dphysics::RigidBodySystem::WriteFrameToReplayFile() {
         
         m_outputFile << "<Body>" << "\n";
         m_outputFile << "POSITION " <<
-            ysMath::GetX(body->Transform.GetWorldPosition()) << " " <<
-            ysMath::GetY(body->Transform.GetWorldPosition()) << " " <<
-            ysMath::GetZ(body->Transform.GetWorldPosition()) << "\n";
+            ysMath::GetX(body->transform.GetWorldPosition()) << " " <<
+            ysMath::GetY(body->transform.GetWorldPosition()) << " " <<
+            ysMath::GetZ(body->transform.GetWorldPosition()) << "\n";
         m_outputFile << "ORIENTATION " <<
-            ysMath::GetQuatW(body->Transform.GetWorldOrientation()) << " " <<
-            ysMath::GetQuatX(body->Transform.GetWorldOrientation()) << " " <<
-            ysMath::GetQuatY(body->Transform.GetWorldOrientation()) << " " <<
-            ysMath::GetQuatZ(body->Transform.GetWorldOrientation()) << "\n";
+            ysMath::GetQuatW(body->transform.GetWorldOrientation()) << " " <<
+            ysMath::GetQuatX(body->transform.GetWorldOrientation()) << " " <<
+            ysMath::GetQuatY(body->transform.GetWorldOrientation()) << " " <<
+            ysMath::GetQuatZ(body->transform.GetWorldOrientation()) << "\n";
         m_outputFile << "</Body>" << "\n";
     }
 
@@ -202,8 +200,8 @@ void dphysics::RigidBodySystem::WriteFrameToReplayFile() {
 void dphysics::RigidBodySystem::GenerateCollisions(RigidBody *body1, RigidBody *body2) {
     if (!body1->IsAwake() && !body2->IsAwake()) return;
 
-    const int nPrim1 = body1->CollisionGeometry.GetNumObjects();
-    const int nPrim2 = body2->CollisionGeometry.GetNumObjects();
+    const int nPrim1 = body1->collisionGeometry.GetNumObjects();
+    const int nPrim2 = body2->collisionGeometry.GetNumObjects();
 
     RigidBody *body1Ord = nullptr;
     RigidBody *body2Ord = nullptr;
@@ -211,8 +209,8 @@ void dphysics::RigidBodySystem::GenerateCollisions(RigidBody *body1, RigidBody *
     bool coarseCollision = true;
     bool coarsePresent = false;
 
-    CollisionObject **object1Prims = body1->CollisionGeometry.GetCollisionObjects();
-    CollisionObject **object2Prims = body2->CollisionGeometry.GetCollisionObjects();
+    CollisionObject **object1Prims = body1->collisionGeometry.GetCollisionObjects();
+    CollisionObject **object2Prims = body2->collisionGeometry.GetCollisionObjects();
 
     for (int i = 0; i < nPrim1; i++) {
         for (int j = 0; j < nPrim2; j++) {
@@ -246,13 +244,13 @@ void dphysics::RigidBodySystem::GenerateCollisions(RigidBody *body1, RigidBody *
                 if (mode1 == CollisionObject::Mode::Fine) {
                     if (prim1->GetType() == CollisionObject::Type::Circle) {
                         if (prim2->GetType() == CollisionObject::Type::Circle) {
-                            nCollisions = CollisionDetector.CircleCircleCollision(
+                            nCollisions = collisionDetector.CircleCircleCollision(
                                 newCollisions, 
                                 body1Ord->GetRoot(), body2Ord->GetRoot(), 
                                 prim1->GetAsCircle(), prim2->GetAsCircle());
                         }
                         else if (prim2->GetType() == CollisionObject::Type::Box) {
-                            nCollisions = CollisionDetector.CircleBoxCollision(
+                            nCollisions = collisionDetector.CircleBoxCollision(
                                 newCollisions, 
                                 body1Ord->GetRoot(), body2Ord->GetRoot(), 
                                 prim1->GetAsCircle(), prim2->GetAsBox());
@@ -262,7 +260,7 @@ void dphysics::RigidBodySystem::GenerateCollisions(RigidBody *body1, RigidBody *
 
                 if (prim1->GetType() == CollisionObject::Type::Box) {
                     if (prim2->GetType() == CollisionObject::Type::Box) {
-                        nCollisions = CollisionDetector.BoxBoxCollision(
+                        nCollisions = collisionDetector.BoxBoxCollision(
                             newCollisions,
                             body1Ord->GetRoot(), body2Ord->GetRoot(), 
                             prim1->GetAsBox(), prim2->GetAsBox());
@@ -274,7 +272,7 @@ void dphysics::RigidBodySystem::GenerateCollisions(RigidBody *body1, RigidBody *
                 {
                     if (prim1->GetType() == CollisionObject::Type::Circle) {
                         if (prim2->GetType() == CollisionObject::Type::Circle) {
-                            bool intersect = CollisionDetector.CircleCircleIntersect(
+                            bool intersect = collisionDetector.CircleCircleIntersect(
                                 body1Ord->GetRoot(), body2Ord->GetRoot(), 
                                 prim1->GetAsCircle(), prim2->GetAsCircle());
 
@@ -290,7 +288,7 @@ void dphysics::RigidBodySystem::GenerateCollisions(RigidBody *body1, RigidBody *
                             }
                         }
                         else if (prim2->GetType() == CollisionObject::Type::Ray) {
-                            nCollisions = CollisionDetector.RayCircleCollision(
+                            nCollisions = collisionDetector.RayCircleCollision(
                                 newCollisions, 
                                 body2Ord->GetRoot(), body1Ord->GetRoot(), 
                                 prim2->GetAsRay(), prim1->GetAsCircle());
@@ -343,7 +341,7 @@ void dphysics::RigidBodySystem::GenerateCollisions() {
 
     for (int i = 0; i < nObjects; i++) {
         m_rigidBodyRegistry.Get(i)->ClearCollisions();
-        m_rigidBodyRegistry.Get(i)->CollisionGeometry.UpdatePrimitives();
+        m_rigidBodyRegistry.Get(i)->collisionGeometry.UpdatePrimitives();
     }
 
     GenerateCollisions(0, 0);
@@ -502,13 +500,13 @@ void dphysics::RigidBodySystem::ResolveCollision(Collision *collision, ysVector 
             velocityChange[b] = collision->m_normal;
             velocityChange[b] = ysMath::Mul(velocityChange[b], ysMath::LoadScalar(linearMove[b] / rotationAmount[b]));
 
-            ysVector pos = body->Transform.GetPositionParentSpace();
+            ysVector pos = body->transform.GetPositionParentSpace();
             pos = ysMath::Add(pos, ysMath::Mul(collision->m_normal, ysMath::LoadScalar(linearMove[b])));
-            body->Transform.SetPosition(pos);
+            body->transform.SetPosition(pos);
 
-            ysQuaternion q = body->Transform.GetOrientationParentSpace();
+            ysQuaternion q = body->transform.GetOrientationParentSpace();
             q = ysMath::QuatAddScaled(q, rotationDirection[b], rotationAmount[b] * 0.5f);
-            body->Transform.SetOrientation(q);
+            body->transform.SetOrientation(q);
         }
     }
 }

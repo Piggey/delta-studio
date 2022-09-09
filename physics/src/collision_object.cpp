@@ -88,22 +88,22 @@ void dphysics::CollisionObject::WriteInfo(std::fstream &target) {
 void dphysics::CollisionObject::ConfigureBox() {
     BoxPrimitive *prim = GetAsBox();
 
-    prim->Orientation = ysMath::QuatMultiply(m_parent->Transform.GetWorldOrientation(), m_relativeOrientation);
-    prim->Position = m_parent->Transform.LocalToWorldSpace(m_relativePosition);
+    prim->Orientation = ysMath::QuatMultiply(m_parent->transform.GetWorldOrientation(), m_relativeOrientation);
+    prim->Position = m_parent->transform.LocalToWorldSpace(m_relativePosition);
 }
 
 void dphysics::CollisionObject::ConfigureCircle() {
     CirclePrimitive *prim = GetAsCircle();
 
-    prim->Position = m_parent->Transform.LocalToWorldSpace(m_relativePosition);
+    prim->Position = m_parent->transform.LocalToWorldSpace(m_relativePosition);
 }
 
 void dphysics::CollisionObject::ConfigureRay() {
     RayPrimitive *prim = GetAsRay();
 
-    ysQuaternion orientation = ysMath::QuatMultiply(m_parent->Transform.GetWorldOrientation(), m_relativeOrientation);
-    prim->Position = m_parent->Transform.LocalToWorldSpace(m_relativePosition);
-    prim->Direction = m_parent->Transform.LocalToWorldDirection(prim->RelativeDirection);
+    ysQuaternion orientation = ysMath::QuatMultiply(m_parent->transform.GetWorldOrientation(), m_relativeOrientation);
+    prim->Position = m_parent->transform.LocalToWorldSpace(m_relativePosition);
+    prim->Direction = m_parent->transform.LocalToWorldDirection(prim->RelativeDirection);
 }
 
 void dphysics::CollisionObject::ConfigurePrimitive() {

@@ -3,7 +3,7 @@
 #include "../include/rigid_body.h"
 
 #include <algorithm>
-#include <stdlib.h>
+#include <cstdlib>
 
 dphysics::Collision::Collision() : ysObject("Collision") {
     m_penetration = 0.0f;
@@ -79,7 +79,7 @@ void dphysics::Collision::UpdateInternals(float timestep) {
 
     for (int i = 0; i < 2; i++) {
         if (m_bodies[i] != nullptr) {
-            m_relativePosition[i] = ysMath::Sub(m_position, m_bodies[i]->Transform.GetWorldPosition());
+            m_relativePosition[i] = ysMath::Sub(m_position, m_bodies[i]->transform.GetWorldPosition());
         }
     }
 
@@ -185,7 +185,7 @@ void dphysics::Collision::CalculateDesiredDeltaVelocity(float timestep) {
 
 ysVector dphysics::Collision::CalculateLocalVelocity(int bodyIndex) {
     RigidBody *body = m_bodies[bodyIndex];
-    ysVector position = ysMath::Add(m_relativePosition[bodyIndex], body->Transform.GetWorldPosition());
+    ysVector position = ysMath::Add(m_relativePosition[bodyIndex], body->transform.GetWorldPosition());
 
     ysVector velocity = body->GetVelocityAtWorldPoint(position);
     ysVector contactVelocity = ysMath::MatMult(ysMath::OrthogonalInverse(m_contactSpace), velocity);

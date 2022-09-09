@@ -12,7 +12,7 @@ dphysics::RigidBody::RigidBody() {
 
     m_inverseInertiaTensor = ysMath::LoadMatrix(ysMath::Constants::Zero, ysMath::Constants::Zero, ysMath::Constants::Zero, ysMath::Constants::IdentityRow4);
 
-    CollisionGeometry.SetParent(this);
+    collisionGeometry.SetParent(this);
 
     m_parent = nullptr;
 
@@ -42,13 +42,13 @@ void dphysics::RigidBody::Integrate(float timeStep) {
 
     ysVector vTimeStep = ysMath::LoadScalar(timeStep);
 
-    ysQuaternion orientation = Transform.GetOrientationParentSpace();
-    ysVector position = Transform.GetPositionParentSpace();
+    ysQuaternion orientation = transform.GetOrientationParentSpace();
+    ysVector position = transform.GetPositionParentSpace();
     orientation = ysMath::QuatAddScaled(orientation, m_angularVelocity, timeStep);
     position = ysMath::Add(position, ysMath::Mul(m_velocity, vTimeStep));
 
-    Transform.SetOrientation(orientation);
-    Transform.SetPosition(position);
+    transform.SetOrientation(orientation);
+    transform.SetPosition(position);
 
     ysVector acceleration = m_acceleration;
     acceleration = ysMath::Add(acceleration, ysMath::Mul(m_forceAccum, ysMath::LoadScalar(m_inverseMass)));
@@ -79,7 +79,7 @@ void dphysics::RigidBody::UpdateDerivedData(bool force) {
 
 void dphysics::RigidBody::CheckAwake() {
     // Determine if rigid body is awake
-    ysVector d = ysMath::Sub(m_lastWorldPosition, Transform.GetWorldPosition());
+    ysVector d = ysMath::Sub(m_lastWorldPosition, transform.GetWorldPosition());
     ysVector d2 = ysMath::Mask(ysMath::Mul(d, d), ysMath::Constants::MaskOffW);
 
     float maxMovement = ysMath::GetScalar(ysMath::MaxComponent(d2));
@@ -93,28 +93,28 @@ void dphysics::RigidBody::CheckAwake() {
 }
 
 ysVector dphysics::RigidBody::GetVelocityAtLocalPoint(const ysVector &localPoint) {
-    ysVector delta = Transform.LocalToParentDirection(localPoint);
+    ysVector delta = transform.LocalToParentDirection(localPoint);
 
     ysVector angularComponent = ysMath::Cross(m_angularVelocity, delta);
     ysVector linearComponent = GetVelocity();
-    return Transform.ParentToWorldDirection(
+    return transform.ParentToWorldDirection(
         ysMath::Add(angularComponent, linearComponent));
 }
 
 ysVector dphysics::RigidBody::GetVelocityAtWorldPoint(const ysVector &worldPoint) {
     ysVector delta = ysMath::Sub(
         worldPoint,
-        Transform.GetWorldPosition());
-    delta = Transform.WorldToParentDirection(delta);
+        transform.GetWorldPosition());
+    delta = transform.WorldToParentDirection(delta);
 
     ysVector angularComponent = ysMath::Cross(m_angularVelocity, delta);
     ysVector linearComponent = GetVelocity();
-    return Transform.ParentToWorldDirection(
+    return transform.ParentToWorldDirection(
         ysMath::Add(angularComponent, linearComponent));
 }
 
 ysMatrix dphysics::RigidBody::GetInverseInertiaTensorWorld() {
-    ysMatrix orientation = ysMath::LoadMatrix(Transform.GetWorldOrientation());
+    ysMatrix orientation = ysMath::LoadMatrix(transform.GetWorldOrientation());
     return ysMath::MatMult(orientation, m_inverseInertiaTensor);
 }
 
@@ -140,7 +140,7 @@ ysMatrix dphysics::RigidBody::GetRectangleTensor(float dx, float dy) {
 
 void dphysics::RigidBody::AddChild(RigidBody *body) {
     body->m_parent = this;
-    body->Transform.SetParent(&Transform);
+    body->transform.SetParent(&transform);
     m_children.New() = body;
 }
 
@@ -149,7 +149,7 @@ void dphysics::RigidBody::RemoveChild(RigidBody *child) {
     if (index == -1) return;
 
     child->m_parent = nullptr;
-    child->Transform.SetParent(nullptr);
+    child->transform.SetParent(nullptr);
     m_children.Delete(index);
 }
 
@@ -169,13 +169,13 @@ void dphysics::RigidBody::AddGridCell(int x, int y) {
 }
 
 void dphysics::RigidBody::AddAngularImpulseLocal(const ysVector &impulse) {
-    ysVector impulseWorld = Transform.LocalToParentDirection(impulse);
+    ysVector impulseWorld = transform.LocalToParentDirection(impulse);
     m_angularImpulseAccum = ysMath::Add(impulseWorld, m_angularImpulseAccum);
 }
 
 void dphysics::RigidBody::AddImpulseLocalSpace(const ysVector &impulse, const ysVector &localPoint) {
-    ysVector impulseWorld = Transform.LocalToParentDirection(impulse);
-    ysVector delta = Transform.LocalToParentDirection(localPoint);
+    ysVector impulseWorld = transform.LocalToParentDirection(impulse);
+    ysVector delta = transform.LocalToParentDirection(localPoint);
     m_impulseAccum = ysMath::Add(m_impulseAccum, impulse);
 
     ysVector angularImpulse = ysMath::Cross(delta, impulse);
@@ -183,9 +183,9 @@ void dphysics::RigidBody::AddImpulseLocalSpace(const ysVector &impulse, const ys
 }
 
 void dphysics::RigidBody::AddImpulseWorldSpace(const ysVector &impulse, const ysVector &point) {
-    ysVector delta = ysMath::Sub(point, Transform.GetWorldPosition());
-    delta = Transform.WorldToParentDirection(delta);
-    ysVector impulseParent = Transform.WorldToParentDirection(impulse);
+    ysVector delta = ysMath::Sub(point, transform.GetWorldPosition());
+    delta = transform.WorldToParentDirection(delta);
+    ysVector impulseParent = transform.WorldToParentDirection(impulse);
 
     m_impulseAccum = ysMath::Add(m_impulseAccum, impulseParent);
 
@@ -194,13 +194,13 @@ void dphysics::RigidBody::AddImpulseWorldSpace(const ysVector &impulse, const ys
 }
 
 void dphysics::RigidBody::AddForceLocalSpace(const ysVector &force, const ysVector &localPoint) {
-    ysVector worldSpace = Transform.LocalToWorldSpace(localPoint);
-    ysVector forceWorldSpace = Transform.LocalToWorldDirection(force);
+    ysVector worldSpace = transform.LocalToWorldSpace(localPoint);
+    ysVector forceWorldSpace = transform.LocalToWorldDirection(force);
     AddForceWorldSpace(forceWorldSpace, worldSpace);
 }
 
 void dphysics::RigidBody::AddForceWorldSpace(const ysVector &force, const ysVector &point) {
-    ysVector delta = ysMath::Sub(point, Transform.GetWorldPosition());
+    ysVector delta = ysMath::Sub(point, transform.GetWorldPosition());
 
     m_forceAccum = ysMath::Add(m_forceAccum, force);
     AddTorque(ysMath::Cross(force, delta));
@@ -225,7 +225,7 @@ void dphysics::RigidBody::GenerateForces(float dt) {
 }
 
 bool dphysics::RigidBody::CheckState() {
-    if (!Transform.IsValid()) return false;
+    if (!transform.IsValid()) return false;
     if (!ysMath::IsValid(m_acceleration)) return false;
     if (!ysMath::IsValid(m_angularVelocity)) return false;
     if (!ysMath::IsValid(m_forceAccum)) return false;
@@ -254,10 +254,10 @@ void dphysics::RigidBody::ClearAccumulators() {
 void dphysics::RigidBody::WriteInfo(std::fstream &target) {
     target << "<RigidBody>" << "\n";
 
-    int collisionObjects = CollisionGeometry.GetNumObjects();
+    int collisionObjects = collisionGeometry.GetNumObjects();
     int count = 0;
     for (int i = 0; i < collisionObjects; ++i) {
-        CollisionObject *object = CollisionGeometry.GetCollisionObject(i);
+        CollisionObject *object = collisionGeometry.GetCollisionObject(i);
         if (object->GetMode() == CollisionObject::Mode::Fine) {
             object->WriteInfo(target);
         }

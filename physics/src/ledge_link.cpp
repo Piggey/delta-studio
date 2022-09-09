@@ -13,7 +13,7 @@ dphysics::LedgeLink::~LedgeLink() {
 }
 
 int dphysics::LedgeLink::GenerateCollisions(Collision *collisionArray) {
-    ysVector gripWorld = m_body1->Transform.LocalToWorldSpace(m_gripLocal);
+    ysVector gripWorld = m_body1->transform.LocalToWorldSpace(m_gripLocal);
 
     float gy, ay;
     gy = ysMath::GetY(gripWorld);

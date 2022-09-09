@@ -12,8 +12,8 @@ dphysics::HingeLink::~HingeLink() {
 }
 
 int dphysics::HingeLink::GenerateCollisions(Collision *collisionArray) {
-    ysVector actualPosition1 = m_body1->Transform.LocalToWorldSpace(m_relativePos1);
-    ysVector actualPosition2 = m_body2->Transform.LocalToWorldSpace(m_relativePos2);
+    ysVector actualPosition1 = m_body1->transform.LocalToWorldSpace(m_relativePos1);
+    ysVector actualPosition2 = m_body2->transform.LocalToWorldSpace(m_relativePos2);
 
     ysVector delta = ysMath::Sub(actualPosition2, actualPosition1);
     ysVector length = ysMath::Magnitude(delta);
