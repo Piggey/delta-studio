@@ -1,10 +1,15 @@
 #include "../include/yds_geometry_preprocessing.h"
 
-#include <limits>
-#include <stdlib.h>
+#if defined(_MSC_VER)
+    #include <limits>
+#else
+    #include <climits>
+#endif
+
 #include <memory>
-#include <assert.h>
-#include <float.h>
+#include <cstdlib>
+#include <cassert>
+#include <cfloat>
 
 bool ysGeometryPreprocessing::ConnectedFaces(ysObjectData *object, int face1, int face2) {
     for (int i = 0; i < 3; i++) {

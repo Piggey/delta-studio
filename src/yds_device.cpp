@@ -2,8 +2,11 @@
 
 #include "../include/yds_vulkan_device.h"
 #include "../include/yds_opengl_device.h"
-#include "../include/yds_d3d11_device.h"
-#include "../include/yds_d3d10_device.h"
+
+#if defined(_MSC_VER)
+    #include "../include/yds_d3d11_device.h"
+    #include "../include/yds_d3d10_device.h"
+#endif
 
 ysDevice::ysDevice() : ysContextObject("API_DEVICE", DeviceAPI::Unknown) {
     for (int i = 0; i < MaxRenderTargets; ++i) m_activeRenderTarget[i] = nullptr;
@@ -46,17 +49,19 @@ ysError ysDevice::CreateDevice(ysDevice **newDevice, DeviceAPI API) {
     if (API == DeviceAPI::Unknown) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
     switch(API) {
+#if defined(_MSC_VER)
     case DeviceAPI::DirectX10:
         *newDevice = new ysD3D10Device;
         break;
     case DeviceAPI::DirectX11:
         *newDevice = new ysD3D11Device;
         break;
-    case DeviceAPI::OpenGL4_0:
-        *newDevice = new ysOpenGLDevice;
-        break;
     case DeviceAPI::Vulkan:
         *newDevice = new ysVulkanDevice;
+        break;
+#endif
+    case DeviceAPI::OpenGL4_0:
+        *newDevice = new ysOpenGLDevice;
         break;
     }
 
