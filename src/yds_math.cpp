@@ -1,6 +1,5 @@
 #include "../include/yds_math.h"
 
-#include <math.h>
 #include <cmath>
 
 ysVector ysMath::UniformRandom4(float range) {
@@ -71,45 +70,82 @@ ysQuaternion ysMath::LoadQuaternion(float angle, const ysVector &axis) {
 
 ysVector4 ysMath::GetVector4(const ysVector &v) {
     ysVector4 r;
+
+#if defined(_MSC_VER)
     r.x = v.m128_f32[0];
     r.y = v.m128_f32[1];
     r.z = v.m128_f32[2];
     r.w = v.m128_f32[3];
+#else
+    r.x = v[0];
+    r.y = v[1];
+    r.z = v[2];
+    r.w = v[3];
+#endif
 
     return r;
 }
 
 ysVector3 ysMath::GetVector3(const ysVector &v) {
     ysVector3 r;
+
+#if defined(_MSC_VER)
     r.x = v.m128_f32[0];
     r.y = v.m128_f32[1];
     r.z = v.m128_f32[2];
+#else
+    r.x = v[0];
+    r.y = v[1];
+    r.z = v[2];
+#endif
 
     return r;
 }
 
 ysVector2 ysMath::GetVector2(const ysVector &v) {
     ysVector2 r;
+
+#if defined(_MSC_VER)
     r.x = v.m128_f32[0];
     r.y = v.m128_f32[1];
+#else
+    r.x = v[0];
+    r.y = v[1];
+#endif
 
     return r;
 }
 
 float ysMath::GetQuatX(const ysQuaternion &v) {
+#if defined(_MSC_VER)
     return v.m128_f32[1];
+#else
+    return v[1];
+#endif
 }
 
 float ysMath::GetQuatY(const ysQuaternion &v) {
+#if defined(_MSC_VER)
     return v.m128_f32[2];
+#else
+    return v[2];
+#endif
 }
 
 float ysMath::GetQuatZ(const ysQuaternion &v) {
+#if defined(_MSC_VER)
     return v.m128_f32[3];
+#else
+    return v[3];
+#endif
 }
 
 float ysMath::GetQuatW(const ysQuaternion &v) {
+#if defined(_MSC_VER)
     return v.m128_f32[0];
+#else
+    return v[0];
+#endif
 }
 
 ysVector ysMath::Dot3(const ysVector &v1, const ysVector &v2) {
