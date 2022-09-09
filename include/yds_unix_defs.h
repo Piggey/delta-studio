@@ -1,7 +1,12 @@
 #ifndef YDS_UNIX_DEFS_H
-#define YDS_TRANSFORM_H
+#define YDS_UNIX_DEFS_H
 
 #if defined(__GNUC__)
+
+    #ifndef __forceinline
+        // since actually forcing to be inline produced many warnings
+        #define __forceinline inline
+    #endif
 
     #ifndef strcpy_s
         #include <cstring>

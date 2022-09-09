@@ -239,26 +239,16 @@ set(DELTA_CORE_SOURCE_FILES
 
 set(LINUX_SUPPORT_SOON_TM
     include/yds_vulkan.h
-    include/yds_vulkan_context.h
+    include/yds_vulkan_context.h src/yds_vulkan_context.cpp
     include/yds_vulkan_decl.h
-    include/yds_vulkan_device.h
-    include/yds_vulkan_gpu_buffer.h
-    include/yds_vulkan_input_layout.h
-    include/yds_vulkan_render_target.h
-    include/yds_vulkan_shader.h
-    include/yds_vulkan_shader_program.h
-    include/yds_vulkan_texture.h
-    include/yds_vulkan_windows_context.h
-
-    src/yds_vulkan_context.cpp
-    src/yds_vulkan_device.cpp
-    src/yds_vulkan_gpu_buffer.cpp
-    src/yds_vulkan_input_layout.cpp
-    src/yds_vulkan_render_target.cpp
-    src/yds_vulkan_shader.cpp
-    src/yds_vulkan_shader_program.cpp
-    src/yds_vulkan_texture.cpp
-    src/yds_vulkan_windows_context.cpp
+    include/yds_vulkan_device.h src/yds_vulkan_device.cpp
+    include/yds_vulkan_gpu_buffer.h src/yds_vulkan_gpu_buffer.cpp
+    include/yds_vulkan_input_layout.h src/yds_vulkan_input_layout.cpp
+    include/yds_vulkan_render_target.h src/yds_vulkan_render_target.cpp
+    include/yds_vulkan_shader.h src/yds_vulkan_shader.cpp
+    include/yds_vulkan_shader_program.h src/yds_vulkan_shader_program.cpp
+    include/yds_vulkan_texture.h src/yds_vulkan_texture.cpp
+    include/yds_vulkan_windows_context.h src/yds_vulkan_windows_context.cpp
 )
 
 # platform specific libraries and stuff
@@ -325,40 +315,58 @@ endif()
 
 add_library(delta-core STATIC ${DELTA_CORE_SOURCE_FILES})
 
-target_link_libraries(delta-core PUBLIC
-    # SDL
-    ${SDL2_LIBRARY}
-    ${SDL2_IMAGE_LIBRARIES}
+if(UNIX)
+    target_link_libraries(delta-core PUBLIC
+        # SDL
+        ${SDL2_LIBRARY}
+        ${SDL2_IMAGE_LIBRARIES}
 
-    # D3DX
-    d3d9
-    d3d10
-    d3d11
-    ${D3DX_LIBS}/d3dx9.lib
-    ${D3DX_LIBS}/d3dx9d.lib
-    ${D3DX_LIBS}/d3dx10d.lib
-    ${D3DX_LIBS}/d3dx10.lib
-    ${D3DX_LIBS}/d3dx11.lib
-    ${D3DX_LIBS}/d3dx11d.lib
-    ${D3DX_LIBS}/d3dxof.lib
+        # OpenGL
+        OpenGL
 
-    # DXGI
-    ${DXGI_LIBS}/DxErr.lib
-    ${DXGI_LIBS}/dxgi.lib
-    ${DXGI_LIBS}/dxguid.lib
+        # Boost
+        Boost::filesystem
 
-    # DirectSound
-    ${DIRECT_SOUND_LIBS}/dsound.lib
-
-    # Vulkan
-    ${VULKAN_LIBS}/vulkan-1.lib
-
-    # Boost
-    Boost::filesystem
-
-    winmm
-    OpenGL32
+        # OpenAL
+        ${OPENAL_LIBRARY}
 )
+
+else(WIN32)
+    target_link_libraries(delta-core PUBLIC
+        # SDL
+        ${SDL2_LIBRARY}
+        ${SDL2_IMAGE_LIBRARIES}
+
+        # D3DX
+        d3d9
+        d3d10
+        d3d11
+        ${D3DX_LIBS}/d3dx9.lib
+        ${D3DX_LIBS}/d3dx9d.lib
+        ${D3DX_LIBS}/d3dx10d.lib
+        ${D3DX_LIBS}/d3dx10.lib
+        ${D3DX_LIBS}/d3dx11.lib
+        ${D3DX_LIBS}/d3dx11d.lib
+        ${D3DX_LIBS}/d3dxof.lib
+
+        # DXGI
+        ${DXGI_LIBS}/DxErr.lib
+        ${DXGI_LIBS}/dxgi.lib
+        ${DXGI_LIBS}/dxguid.lib
+
+        # DirectSound
+        ${DIRECT_SOUND_LIBS}/dsound.lib
+
+        # Vulkan
+        ${VULKAN_LIBS}/vulkan-1.lib
+
+        # Boost
+        Boost::filesystem
+
+        winmm
+        OpenGL32
+    )
+endif()
 
 add_subdirectory(physics)
 add_subdirectory(engines)

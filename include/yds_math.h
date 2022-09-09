@@ -1,16 +1,12 @@
 #ifndef YDS_MATH_H
 #define YDS_MATH_H
 
+#include "yds_unix_defs.h"
+
 #include <xmmintrin.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#if defined(__GNUC__)
-    #ifndef __forceinline
-        #define __forceinline inline
-    #endif
-#endif
 
 // Extra Definitions
 
@@ -125,7 +121,8 @@ struct ysMatrix33 {
 };
 
 #if defined(__GNUC__)
-    #define YS_MATH_CONST extern constexpr
+    // #define YS_MATH_CONST extern constexpr
+    #define YS_MATH_CONST constexpr
 #elif defined(_MSC_VER)
     #define YS_MATH_CONST extern const __declspec(selectany)
 #endif
