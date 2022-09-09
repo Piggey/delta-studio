@@ -40,7 +40,11 @@ public:
     }
 
     template<typename DYN_TYPE>
+#if defined(_MSC_VER) // that void return just seems wrong but maybe thats some weird vc++ stuff
     void NewGeneric(DYN_TYPE *obj, int alignment = 0) {
+#else
+    DYN_TYPE NewGeneric(DYN_TYPE *obj, int alignment = 0) {
+#endif
         if (m_nObjects >= m_maxSize) Extend();
 
         m_array[m_nObjects] = static_cast<TYPE *>(obj);
