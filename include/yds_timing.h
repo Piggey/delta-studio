@@ -1,7 +1,7 @@
 #ifndef YS_TIMING_H
 #define YS_TIMING_H
 
-#include <stdint.h>
+#include <cstdint>
 
 uint64_t SystemTime();
 
@@ -30,16 +30,16 @@ public:
     void Update();
     void Initialize();
 
-    double GetFrameDuration();
-    uint64_t GetFrameDuration_us();
+    double GetFrameDuration() const;
+    uint64_t GetFrameDuration_us() const;
 
     uint64_t GetTime();
-    unsigned __int64 GetClock();
+    uint64_t GetClock();
 
     void SetPrecisionMode(Precision mode);
     Precision GetPrecisionMode() const { return m_precisionMode; }
 
-    double ConvertToSeconds(uint64_t t_u);
+    double ConvertToSeconds(uint64_t t_u) const;
 
     float GetFPS() const { return m_fps; }
 
