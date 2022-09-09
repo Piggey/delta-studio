@@ -3,7 +3,11 @@
 
 #include "yds_opengl_context.h"
 
-#include "OpenGL.h"
+#if defined(_MSC_VER)
+    #include "OpenGL.h"
+#elif defined(__GNUC__)
+    #include <GL/gl.h>
+#endif
 
 class ysOpenGLDevice;
 
@@ -11,22 +15,25 @@ class ysOpenGLWindowsContext : public ysOpenGLVirtualContext {
     friend ysOpenGLDevice;
 
 public:
-    ysOpenGLWindowsContext();
-    virtual ~ysOpenGLWindowsContext();
+    explicit ysOpenGLWindowsContext(ysWindowSystemObject::Platform platform = ysWindowSystem::Platform::Windows);
+
+    ~ysOpenGLWindowsContext() override;
 
     ysError CreateRenderingContext(ysOpenGLDevice *device, ysWindow *window, int major, int minor);
 
-    virtual ysError DestroyContext();
-    virtual ysError TransferContext(ysOpenGLVirtualContext *context);
-    virtual ysError SetContextMode(ContextMode mode);
-    virtual ysError SetContext(ysRenderingContext *realContext);
-    virtual ysError Present();
+    ysError DestroyContext() override;
+    ysError TransferContext(ysOpenGLVirtualContext *context) override;
+    ysError SetContextMode(ContextMode mode) override;
+    ysError SetContext(ysRenderingContext *realContext) override;
+    ysError Present() override;
 
 protected:
-    HDC m_deviceHandle;
-    HGLRC m_contextHandle;
+    // HDC m_deviceHandle;
+    // HGLRC m_contextHandle;
 
     ysOpenGLDevice *m_device;
+    SDL_GLContext* m_context;
+    SDL_Window* m_window;
 
 protected:
     void LoadAllExtensions();

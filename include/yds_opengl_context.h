@@ -4,15 +4,21 @@
 #include "yds_window.h"
 #include "yds_rendering_context.h"
 
-#include <OpenGL.h>
+#if defined(_MSC_VER)
+    #include <OpenGL.h>
+#elif defined(__GNUC__)
+    #include <GL/gl.h>
+    #include <SDL2/SDL.h>
+#endif
+
 
 class ysOpenGLVirtualContext : public ysRenderingContext {
     friend class ysOpenGLDevice;
 
 public:
     ysOpenGLVirtualContext();
-    ysOpenGLVirtualContext(ysWindowSystemObject::Platform platform);
-    virtual ~ysOpenGLVirtualContext();
+    explicit ysOpenGLVirtualContext(ysWindowSystemObject::Platform platform);
+    ~ysOpenGLVirtualContext() override;
 
     virtual ysError DestroyContext() {
         return YDS_ERROR_RETURN(ysError::None); 
@@ -122,11 +128,11 @@ public:
     PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer = nullptr;
     PFNGLBLENDEQUATIONPROC glBlendEquation = nullptr;
 
-    PFNWGLMAKECONTEXTCURRENTARBPROC wglMakeContextCurrent = nullptr;
-    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
-    PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
+    // PFNWGLMAKECONTEXTCURRENTARBPROC wglMakeContextCurrent = nullptr;
+    // PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
+    // PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
 
-    bool IsRealContext() { return m_isRealContext; }
+    bool IsRealContext() const { return m_isRealContext; }
 
 protected:
     bool m_isRealContext;

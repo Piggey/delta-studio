@@ -1,6 +1,11 @@
 #include "../include/yds_opengl_gpu_buffer.h"
 
-#include <OpenGL.h>
+#if defined(_MSC_VER)
+    #include <OpenGL.h>
+#elif defined(__GNUC__)
+    #include <GL/gl.h>
+#endif
+
 
 ysOpenGLGPUBuffer::ysOpenGLGPUBuffer() : ysGPUBuffer(DeviceAPI::OpenGL4_0) {
     m_bufferHandle = 0;

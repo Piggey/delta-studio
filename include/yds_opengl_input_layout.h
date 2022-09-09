@@ -2,7 +2,6 @@
 #define YDS_OPENGL_INPUT_LAYOUT_H
 
 #include "yds_input_layout.h"
-
 #include "yds_dynamic_array.h"
 
 class ysOpenGLDevice;

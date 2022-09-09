@@ -1,13 +1,12 @@
 #include "../include/yds_opengl_windows_context.h"
 
 #include "../include/yds_opengl_device.h"
-#include "../include/yds_windows_window.h"
-#include "../include/yds_windows_window_system.h"
+#include "../include/yds_window.h"
 
-ysOpenGLWindowsContext::ysOpenGLWindowsContext() : ysOpenGLVirtualContext(ysWindowSystem::Platform::Windows) {
-    m_contextHandle = nullptr;
+#include <SDL2/SDL.h>
+
+ysOpenGLWindowsContext::ysOpenGLWindowsContext(ysWindowSystemObject::Platform platform) : ysOpenGLVirtualContext(platform) {
     m_device = nullptr;
-    m_deviceHandle = nullptr;
 }
 
 ysOpenGLWindowsContext::~ysOpenGLWindowsContext() {
@@ -17,116 +16,51 @@ ysOpenGLWindowsContext::~ysOpenGLWindowsContext() {
 ysError ysOpenGLWindowsContext::CreateRenderingContext(ysOpenGLDevice *device, ysWindow *window, int major, int minor) {
     YDS_ERROR_DECLARE("CreateRenderingContext");
 
-    if (window->GetPlatform() != ysWindowSystemObject::Platform::Windows) {
+    if (window->GetPlatform() == ysWindowSystemObject::Platform::Unknown) {
         return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
     }
 
-    GLenum result = glGetError();
-    BOOL wresult = 0;
+    // init SDL
+    int init_result = SDL_Init(SDL_INIT_VIDEO);
 
-    ysWindowsWindow *windowsWindow = static_cast<ysWindowsWindow *>(window);
-
-    HDC deviceHandle = GetDC(windowsWindow->GetWindowHandle());
-
-    // Default
-    m_device = nullptr;
-    m_deviceHandle = NULL;
-    m_targetWindow = NULL;
-    m_contextHandle = NULL;
-    m_isRealContext = false;
-    
-    // Create dummy context
-    WNDCLASSEX wc;
-    wc.cbSize = sizeof(WNDCLASSEX);
-
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = (WNDPROC)(ysWindowsWindowSystem::WinProc);
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = windowsWindow->GetInstance();
-    wc.hIcon = NULL;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wc.lpszMenuName = NULL;
-    wc.lpszClassName = "DUMMY_WINDOW";
-    wc.hIconSm = NULL;
-
-    RegisterClassEx(&wc);
-
-    HWND dummyWnd = CreateWindow("DUMMY_WINDOW", "", 0, 0, 0, 0, 0, 0, 0, windowsWindow->GetInstance(), 0);
-    HDC dummyDeviceHandle = GetDC(dummyWnd);
-
-    PIXELFORMATDESCRIPTOR pfd;
-    memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-    pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 32;
-    pfd.cDepthBits = 32;
-    pfd.iLayerType = PFD_MAIN_PLANE;
-
-    unsigned int pixelFormat = ChoosePixelFormat(dummyDeviceHandle, &pfd);
-    SetPixelFormat(dummyDeviceHandle, pixelFormat, &pfd);
-
-    HGLRC tempContext = wglCreateContext(dummyDeviceHandle);
-    if (tempContext == nullptr) return YDS_ERROR_RETURN(ysError::CouldNotCreateTemporaryContext);
-
-    wresult = wglMakeCurrent(dummyDeviceHandle, tempContext);
-    if (wresult == FALSE) return YDS_ERROR_RETURN(ysError::CouldNotActivateTemporaryContext);
-
-    LoadContextCreationExtension();
-
-    const int contextAttribs[] = {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, major,
-        WGL_CONTEXT_MINOR_VERSION_ARB, minor,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
-
-    const int pixelFormatAttributes[] = {
-        WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-        WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-        WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-        WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-        WGL_COLOR_BITS_ARB, 32,
-        WGL_DEPTH_BITS_ARB, 24,
-        WGL_STENCIL_BITS_ARB, 8,
-        WGL_SAMPLE_BUFFERS_ARB, 1,
-        WGL_SAMPLES_ARB, 8,
-        0
-    };
-
-    int msPixelFormat;
-    UINT numFormats;
-
-    wglChoosePixelFormatARB(deviceHandle, pixelFormatAttributes, NULL, 1, &msPixelFormat, &numFormats);
-    SetPixelFormat(deviceHandle, msPixelFormat, &pfd);
-
-    wglMakeCurrent(0, 0);
-
-    // Create a context if one doesn't already exist
-    if (device->UpdateContext() == nullptr) {
-        HGLRC hRC = wglCreateContextAttribsARB(deviceHandle, 0, contextAttribs);
-        if (hRC == 0) return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
-
-        wresult = wglMakeCurrent(deviceHandle, hRC);
-        if (wresult == FALSE) {
-            wglDeleteContext(hRC);
-            return YDS_ERROR_RETURN(ysError::CouldNotActivateContext);
-        }
-
-        m_contextHandle = hRC;
-        m_isRealContext = true;
-
-        device->UpdateContext();
+    if (init_result != 0) {
+        fprintf(stderr, "%s\n", SDL_GetError());
     }
 
-    wglDeleteContext(tempContext);
-    DestroyWindow(dummyWnd);
+    // set pixel stuff
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    // create SDL window
+    m_window = SDL_CreateWindow(
+        window->GetTitle(),
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        window->GetWidth(),
+        window->GetHeight(),
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_MOUSE_CAPTURE
+    );
+
+    // generate context
+    *m_context = SDL_GL_CreateContext(m_window);
+
+    if (m_context == NULL) {
+        fprintf(stderr, "%s\n", SDL_GetError());
+        return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
+    }
+
+    if(SDL_GL_MakeCurrent(m_window, m_context) != 0) {
+        fprintf(stderr, "%s\n", SDL_GetError());
+        return YDS_ERROR_RETURN(ysError::CouldNotActivateTemporaryContext);
+    }
+
+    m_isRealContext = true;
+    device->UpdateContext();
 
     m_device = device;
-    m_deviceHandle = deviceHandle;
     m_targetWindow = window;
 
     LoadAllExtensions();
@@ -137,11 +71,8 @@ ysError ysOpenGLWindowsContext::CreateRenderingContext(ysOpenGLDevice *device, y
 ysError ysOpenGLWindowsContext::DestroyContext() {
     YDS_ERROR_DECLARE("DestroyContext");
 
-    wglMakeCurrent(NULL, NULL);
-    if (m_contextHandle) {
-        BOOL result = wglDeleteContext(m_contextHandle);
-        if (result == FALSE) return YDS_ERROR_RETURN(ysError::CouldNotDestroyContext);
-    }
+    SDL_GL_DeleteContext(m_context);
+    SDL_DestroyWindow(m_window);
 
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -149,14 +80,14 @@ ysError ysOpenGLWindowsContext::DestroyContext() {
 ysError ysOpenGLWindowsContext::TransferContext(ysOpenGLVirtualContext *context) {
     YDS_ERROR_DECLARE("TransferContext");
 
-    if (context->GetPlatform() != ysWindowSystemObject::Platform::Windows) return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
+    if (context->GetPlatform() == ysWindowSystemObject::Platform::Unknown) 
+        return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
     ysOpenGLWindowsContext *windowsContext = static_cast<ysOpenGLWindowsContext *>(context);
-    windowsContext->m_contextHandle = m_contextHandle;
+    windowsContext->m_context = m_context;
     windowsContext->m_isRealContext = true;
 
     m_isRealContext = false;
-    m_contextHandle = NULL;
 
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -171,24 +102,21 @@ ysError ysOpenGLWindowsContext::SetContextMode(ContextMode mode) {
     if (mode == ysRenderingContext::ContextMode::Fullscreen) {
         window->SetWindowStyle(ysWindow::WindowStyle::Fullscreen);
 
-        DEVMODE dmScreenSettings;
-        memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
-        dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-        dmScreenSettings.dmPelsWidth = monitor->GetPhysicalWidth();
-        dmScreenSettings.dmPelsHeight = monitor->GetPhysicalHeight();
-        dmScreenSettings.dmBitsPerPel = 32;
-        dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+        SDL_DisplayMode mode;
+        mode.format = SDL_PIXELFORMAT_RGBA8888;
+        mode.h = monitor->GetPhysicalHeight();
+        mode.w = monitor->GetPhysicalWidth();
+        mode.refresh_rate = 0;
+        mode.driverdata = 0;
 
-        result = ChangeDisplaySettingsEx(monitor->GetDeviceName(), &dmScreenSettings, NULL, CDS_FULLSCREEN | CDS_UPDATEREGISTRY, NULL);
-        if (result != DISP_CHANGE_SUCCESSFUL) {
+        if (SDL_SetWindowDisplayMode(m_window, &mode) != 0) {
             return YDS_ERROR_RETURN(ysError::CouldNotEnterFullscreen);
         }
     }
     else if (mode == ysRenderingContext::ContextMode::Windowed) {
         window->SetWindowStyle(ysWindow::WindowStyle::Windowed);
 
-        result = ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
-        if (result != DISP_CHANGE_SUCCESSFUL) {
+        if (SDL_SetWindowDisplayMode(m_window, NULL) != 0) {
             return YDS_ERROR_RETURN(ysError::CouldNotExitFullscreen);
         }
     }
@@ -199,19 +127,16 @@ ysError ysOpenGLWindowsContext::SetContextMode(ContextMode mode) {
 ysError ysOpenGLWindowsContext::SetContext(ysRenderingContext *realContext) {
     YDS_ERROR_DECLARE("SetContext");
 
-    ysOpenGLWindowsContext *realOpenglContext = static_cast<ysOpenGLWindowsContext *>(realContext);
-    BOOL result;
-
-    if (realContext != nullptr) {
-        result = wglMakeCurrent(m_deviceHandle, realOpenglContext->m_contextHandle);
-        if (result == FALSE) {
-            DWORD lastError = GetLastError();
-
-            return YDS_ERROR_RETURN(ysError::CouldNotActivateContext);
-        }
+    if (realContext == nullptr) {
+        SDL_GL_MakeCurrent(NULL, NULL);
+        return YDS_ERROR_RETURN(ysError::NoContext);
     }
-    else {
-        wglMakeCurrent(NULL, NULL);
+
+    ysOpenGLWindowsContext *realOpenglContext = static_cast<ysOpenGLWindowsContext *>(realContext);
+
+    if (SDL_GL_MakeCurrent(m_window, realOpenglContext->m_context) != 0) {
+        fprintf(stderr, "%s\n", SDL_GetError());
+        return YDS_ERROR_RETURN(ysError::CouldNotActivateContext);
     }
 
     return YDS_ERROR_RETURN(ysError::None);
@@ -220,103 +145,95 @@ ysError ysOpenGLWindowsContext::SetContext(ysRenderingContext *realContext) {
 ysError ysOpenGLWindowsContext::Present() {
     YDS_ERROR_DECLARE("Present");
 
-    if (SwapBuffers(m_deviceHandle) == FALSE) return YDS_ERROR_RETURN(ysError::BufferSwapError);
-
+    SDL_GL_SwapWindow(m_window);
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-void ysOpenGLWindowsContext::LoadContextCreationExtension() {
-    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
-    wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-}
 
 void ysOpenGLWindowsContext::LoadAllExtensions() {
-    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
-
-    glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
-    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
-    glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
-    glBindBufferRange = (PFNGLBINDBUFFERRANGEPROC)wglGetProcAddress("glBindBufferRange");
-    glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
-    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
-    glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays");
-    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
-    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
-    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
-    glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)wglGetProcAddress("glVertexAttribIPointer");
-    glVertexAttrib3f = (PFNGLVERTEXATTRIB3FPROC)wglGetProcAddress("glVertexAttrib3f");
-    glVertexAttrib4f = (PFNGLVERTEXATTRIB4FPROC)wglGetProcAddress("glVertexAttrib4f");
+    glGenBuffers = (PFNGLGENBUFFERSPROC)SDL_GL_GetProcAddress("glGenBuffers");
+    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)SDL_GL_GetProcAddress("glDeleteBuffers");
+    glBindBuffer = (PFNGLBINDBUFFERPROC)SDL_GL_GetProcAddress("glBindBuffer");
+    glBindBufferRange = (PFNGLBINDBUFFERRANGEPROC)SDL_GL_GetProcAddress("glBindBufferRange");
+    glBufferData = (PFNGLBUFFERDATAPROC)SDL_GL_GetProcAddress("glBufferData");
+    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)SDL_GL_GetProcAddress("glGenVertexArrays");
+    glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)SDL_GL_GetProcAddress("glDeleteVertexArrays");
+    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)SDL_GL_GetProcAddress("glBindVertexArray");
+    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)SDL_GL_GetProcAddress("glEnableVertexAttribArray");
+    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)SDL_GL_GetProcAddress("glVertexAttribPointer");
+    glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)SDL_GL_GetProcAddress("glVertexAttribIPointer");
+    glVertexAttrib3f = (PFNGLVERTEXATTRIB3FPROC)SDL_GL_GetProcAddress("glVertexAttrib3f");
+    glVertexAttrib4f = (PFNGLVERTEXATTRIB4FPROC)SDL_GL_GetProcAddress("glVertexAttrib4f");
 
     // Shaders
-    glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
-    glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
+    glDeleteShader = (PFNGLDELETESHADERPROC)SDL_GL_GetProcAddress("glDeleteShader");
+    glDeleteProgram = (PFNGLDELETEPROGRAMPROC)SDL_GL_GetProcAddress("glDeleteProgram");
 
-    glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
-    glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
-    glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
-    glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
-    glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
-    glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader");
-    glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
-    glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
-    glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation");
-    glBindFragDataLocation = (PFNGLBINDFRAGDATALOCATIONPROC)wglGetProcAddress("glBindFragDataLocation");
-    glGetFragDataLocation = (PFNGLGETFRAGDATALOCATIONPROC)wglGetProcAddress("glGetFragDataLocation");
-    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
-    glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
-    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
-    glDrawBuffers = (PFNGLDRAWBUFFERSPROC)wglGetProcAddress("glDrawBuffers");
+    glCreateShader = (PFNGLCREATESHADERPROC)SDL_GL_GetProcAddress("glCreateShader");
+    glShaderSource = (PFNGLSHADERSOURCEPROC)SDL_GL_GetProcAddress("glShaderSource");
+    glCompileShader = (PFNGLCOMPILESHADERPROC)SDL_GL_GetProcAddress("glCompileShader");
+    glCreateProgram = (PFNGLCREATEPROGRAMPROC)SDL_GL_GetProcAddress("glCreateProgram");
+    glAttachShader = (PFNGLATTACHSHADERPROC)SDL_GL_GetProcAddress("glAttachShader");
+    glDetachShader = (PFNGLDETACHSHADERPROC)SDL_GL_GetProcAddress("glDetachShader");
+    glLinkProgram = (PFNGLLINKPROGRAMPROC)SDL_GL_GetProcAddress("glLinkProgram");
+    glUseProgram = (PFNGLUSEPROGRAMPROC)SDL_GL_GetProcAddress("glUseProgram");
+    glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)SDL_GL_GetProcAddress("glBindAttribLocation");
+    glBindFragDataLocation = (PFNGLBINDFRAGDATALOCATIONPROC)SDL_GL_GetProcAddress("glBindFragDataLocation");
+    glGetFragDataLocation = (PFNGLGETFRAGDATALOCATIONPROC)SDL_GL_GetProcAddress("glGetFragDataLocation");
+    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)SDL_GL_GetProcAddress("glGetUniformLocation");
+    glGetShaderiv = (PFNGLGETSHADERIVPROC)SDL_GL_GetProcAddress("glGetShaderiv");
+    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)SDL_GL_GetProcAddress("glGetShaderInfoLog");
+    glDrawBuffers = (PFNGLDRAWBUFFERSPROC)SDL_GL_GetProcAddress("glDrawBuffers");
 
-    glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv");
-    glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv");
-    glUniform2fv = (PFNGLUNIFORM2FVPROC)wglGetProcAddress("glUniform2fv");
-    glUniform4f = (PFNGLUNIFORM4FPROC)wglGetProcAddress("glUniform4f");
-    glUniform3f = (PFNGLUNIFORM3FPROC)wglGetProcAddress("glUniform3f");
-    glUniform2f = (PFNGLUNIFORM2FPROC)wglGetProcAddress("glUniform2f");
-    glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
-    glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
+    glUniform4fv = (PFNGLUNIFORM4FVPROC)SDL_GL_GetProcAddress("glUniform4fv");
+    glUniform3fv = (PFNGLUNIFORM3FVPROC)SDL_GL_GetProcAddress("glUniform3fv");
+    glUniform2fv = (PFNGLUNIFORM2FVPROC)SDL_GL_GetProcAddress("glUniform2fv");
+    glUniform4f = (PFNGLUNIFORM4FPROC)SDL_GL_GetProcAddress("glUniform4f");
+    glUniform3f = (PFNGLUNIFORM3FPROC)SDL_GL_GetProcAddress("glUniform3f");
+    glUniform2f = (PFNGLUNIFORM2FPROC)SDL_GL_GetProcAddress("glUniform2f");
+    glUniform1f = (PFNGLUNIFORM1FPROC)SDL_GL_GetProcAddress("glUniform1f");
+    glUniform1i = (PFNGLUNIFORM1IPROC)SDL_GL_GetProcAddress("glUniform1i");
 
-    glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv");
-    glUniformMatrix3fv = (PFNGLUNIFORMMATRIX3FVPROC)wglGetProcAddress("glUniformMatrix3fv");
+    glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)SDL_GL_GetProcAddress("glUniformMatrix4fv");
+    glUniformMatrix3fv = (PFNGLUNIFORMMATRIX3FVPROC)SDL_GL_GetProcAddress("glUniformMatrix3fv");
 
-    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv");
+    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)SDL_GL_GetProcAddress("glGetProgramiv");
 
-    glGetActiveUniformName = (PFNGLGETACTIVEUNIFORMNAMEPROC)wglGetProcAddress("glGetActiveUniformName");
-    glGetActiveUniformsiv = (PFNGLGETACTIVEUNIFORMSIVPROC)wglGetProcAddress("glGetActiveUniformsiv");
-    glGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)wglGetProcAddress("glGetActiveUniform");
+    glGetActiveUniformName = (PFNGLGETACTIVEUNIFORMNAMEPROC)SDL_GL_GetProcAddress("glGetActiveUniformName");
+    glGetActiveUniformsiv = (PFNGLGETACTIVEUNIFORMSIVPROC)SDL_GL_GetProcAddress("glGetActiveUniformsiv");
+    glGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)SDL_GL_GetProcAddress("glGetActiveUniform");
 
-    glMapBuffer = (PFNGLMAPBUFFERPROC)wglGetProcAddress("glMapBuffer");
-    glMapBufferRange = (PFNGLMAPBUFFERRANGEPROC)wglGetProcAddress("glMapBufferRange");
-    glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)wglGetProcAddress("glUnmapBuffer");
+    glMapBuffer = (PFNGLMAPBUFFERPROC)SDL_GL_GetProcAddress("glMapBuffer");
+    glMapBufferRange = (PFNGLMAPBUFFERRANGEPROC)SDL_GL_GetProcAddress("glMapBufferRange");
+    glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)SDL_GL_GetProcAddress("glUnmapBuffer");
 
-    glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)wglGetProcAddress("glDrawElementsBaseVertex");
+    glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)SDL_GL_GetProcAddress("glDrawElementsBaseVertex");
 
     // Textures
-    glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
-    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
+    glActiveTexture = (PFNGLACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glActiveTexture");
+    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)SDL_GL_GetProcAddress("glGenerateMipmap");
 
-    glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)wglGetProcAddress("glTexImage2DMultisample");
+    glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)SDL_GL_GetProcAddress("glTexImage2DMultisample");
 
     // Buffers
-    glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers");
-    glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)wglGetProcAddress("glDeleteRenderbuffers");
-    glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer");
-    glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage");
-    glRenderbufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)wglGetProcAddress("glRenderbufferStorageMultisample");
-    glCopyBufferSubData = (PFNGLCOPYBUFFERSUBDATAPROC)wglGetProcAddress("glCopyBufferSubData");
-    glBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData");
+    glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)SDL_GL_GetProcAddress("glGenRenderbuffers");
+    glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)SDL_GL_GetProcAddress("glDeleteRenderbuffers");
+    glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)SDL_GL_GetProcAddress("glBindRenderbuffer");
+    glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)SDL_GL_GetProcAddress("glRenderbufferStorage");
+    glRenderbufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)SDL_GL_GetProcAddress("glRenderbufferStorageMultisample");
+    glCopyBufferSubData = (PFNGLCOPYBUFFERSUBDATAPROC)SDL_GL_GetProcAddress("glCopyBufferSubData");
+    glBufferSubData = (PFNGLBUFFERSUBDATAPROC)SDL_GL_GetProcAddress("glBufferSubData");
 
-    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers");
-    glDeleteFramebuffers = (PFNGLDELETERENDERBUFFERSPROC)wglGetProcAddress("glDeleteFramebuffers");
-    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer");
-    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D");
-    glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer");
-    glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus");
+    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)SDL_GL_GetProcAddress("glGenFramebuffers");
+    glDeleteFramebuffers = (PFNGLDELETERENDERBUFFERSPROC)SDL_GL_GetProcAddress("glDeleteFramebuffers");
+    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)SDL_GL_GetProcAddress("glBindFramebuffer");
+    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)SDL_GL_GetProcAddress("glFramebufferTexture2D");
+    glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)SDL_GL_GetProcAddress("glFramebufferRenderbuffer");
+    glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
 
-    glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)wglGetProcAddress("glBlitFramebuffer");
+    glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)SDL_GL_GetProcAddress("glBlitFramebuffer");
 
     // Blending
-    glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress("glBlendEquation");
-
-    wglMakeContextCurrent = (PFNWGLMAKECONTEXTCURRENTARBPROC)wglGetProcAddress("wglMakeContextCurrentARB");
+    glBlendEquation = (PFNGLBLENDEQUATIONPROC)SDL_GL_GetProcAddress("glBlendEquation");
 }
+

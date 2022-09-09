@@ -9,7 +9,12 @@
 
 #include "../include/yds_opengl_windows_context.h"
 
-#include "OpenGL.h"
+#if defined(_MSC_VER)
+    #include "OpenGL.h"
+#elif defined(__GNUC__)
+    #include <GL/gl.h>
+#endif
+
 #include <SDL.h>
 #include <SDL_image.h>
 
@@ -54,8 +59,9 @@ ysError ysOpenGLDevice::CreateRenderingContext(ysRenderingContext **context, ysW
     if (context == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     *context = nullptr;
 
-    if (window->GetPlatform() == ysWindowSystemObject::Platform::Windows) {
-        ysOpenGLWindowsContext *newContext = m_renderingContexts.NewGeneric<ysOpenGLWindowsContext>();
+    if (window->GetPlatform() == ysWindowSystemObject::Platform::Windows ||
+        window->GetPlatform() == ysWindowSystemObject::Platform::Linux) {
+        auto *newContext = m_renderingContexts.NewGeneric<ysOpenGLWindowsContext>();
         YDS_NESTED_ERROR_CALL(newContext->CreateRenderingContext(this, window, 4, 3));
 
         // TEMP
@@ -67,9 +73,8 @@ ysError ysOpenGLDevice::CreateRenderingContext(ysRenderingContext **context, ysW
         *context = static_cast<ysRenderingContext *>(newContext);
 
         return YDS_ERROR_RETURN(ysError::None);
-    }
-    else {
-        return YDS_ERROR_RETURN_MSG(ysError::IncompatiblePlatforms, "Only Windows platforms are currently supported.");
+    } else {
+        return YDS_ERROR_RETURN_MSG(ysError::IncompatiblePlatforms, "Platform is not supported.");
     }
 }
 
@@ -77,7 +82,7 @@ ysError ysOpenGLDevice::UpdateRenderingContext(ysRenderingContext *context) {
     YDS_ERROR_DECLARE("UpdateRenderingContext");
 
     ysRenderTarget *target = context->GetAttachedRenderTarget();
-    ysOpenGLVirtualContext *openglContext = static_cast<ysOpenGLVirtualContext *>(context);
+    auto *openglContext = dynamic_cast<ysOpenGLVirtualContext *>(context);
 
     const int width = context->GetWindow()->GetGameWidth();
     const int height = context->GetWindow()->GetGameHeight();
@@ -100,7 +105,7 @@ ysError ysOpenGLDevice::DestroyRenderingContext(ysRenderingContext *&context) {
         SetRenderingContext(nullptr);
     }
 
-    ysOpenGLVirtualContext *openglContext = static_cast<ysOpenGLVirtualContext *>(context);
+    auto *openglContext = dynamic_cast<ysOpenGLVirtualContext *>(context);
 
     if (openglContext->IsRealContext()) {
         ysOpenGLVirtualContext *transferContext = GetTransferContext();
@@ -126,7 +131,7 @@ ysError ysOpenGLDevice::SetContextMode(ysRenderingContext *context, ysRenderingC
     if (context == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     if (!CheckCompatibility(context)) return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
-    ysOpenGLVirtualContext *openglContext = static_cast<ysOpenGLVirtualContext *>(context);
+    auto *openglContext = dynamic_cast<ysOpenGLVirtualContext *>(context);
     openglContext->SetContextMode(mode);
 
     return YDS_ERROR_RETURN(ysError::None);
@@ -163,7 +168,7 @@ ysError ysOpenGLDevice::CreateOnScreenRenderTarget(ysRenderTarget **newTarget, y
     if (context->GetAttachedRenderTarget() != nullptr) return YDS_ERROR_RETURN(ysError::ContextAlreadyHasRenderTarget);
 
     ysOpenGLRenderTarget *newRenderTarget = m_renderTargets.NewGeneric<ysOpenGLRenderTarget>();
-    ysOpenGLVirtualContext *openglContext = static_cast<ysOpenGLVirtualContext *>(context);
+    ysOpenGLVirtualContext *openglContext = dynamic_cast<ysOpenGLVirtualContext *>(context);
 
     openglContext->m_attachedRenderTarget = newRenderTarget;
 
@@ -696,8 +701,15 @@ ysError ysOpenGLDevice::CreateVertexShader(ysShader **newShader, const char *sha
     }
 
     ysOpenGLShader *newOpenGLShader = m_shaders.NewGeneric<ysOpenGLShader>();
+
+#if defined(_MSC_VER)
     strcpy_s(newOpenGLShader->m_shaderName, 64, shaderName);
     strcpy_s(newOpenGLShader->m_filename, 256, shaderFilename);
+#elif defined(__GNUC__)
+    strncpy(newOpenGLShader->m_shaderName, shaderName, 64);
+    strncpy(newOpenGLShader->m_filename, shaderFilename, 256);
+#endif
+
     newOpenGLShader->m_shaderType = ysShader::ShaderType::Vertex;
     newOpenGLShader->m_handle = handle;
 
@@ -749,8 +761,15 @@ ysError ysOpenGLDevice::CreatePixelShader(ysShader **newShader, const char *shad
     }
 
     ysOpenGLShader *newOpenGLShader = m_shaders.NewGeneric<ysOpenGLShader>();
+
+#if defined(_MSC_VER)
     strcpy_s(newOpenGLShader->m_shaderName, 64, shaderName);
     strcpy_s(newOpenGLShader->m_filename, 256, shaderFilename);
+#elif defined(__GNUC__)
+    strncpy(newOpenGLShader->m_shaderName, shaderName, 64);
+    strncpy(newOpenGLShader->m_filename, shaderFilename, 256);
+#endif
+
     newOpenGLShader->m_shaderType = ysShader::ShaderType::Pixel;
     newOpenGLShader->m_handle = shaderHandle;
 
@@ -952,7 +971,12 @@ ysError ysOpenGLDevice::CreateTexture(ysTexture **texture, const char *fname) {
     }
 
     ysOpenGLTexture *newTexture = m_textures.NewGeneric<ysOpenGLTexture>();
+
+#if defined(_MSC_VER)
     strcpy_s(newTexture->m_filename, 257, fname);
+#elif defined(__GNUC__)
+    strncpy(newTexture->m_filename, fname, 257);
+#endif
 
     glGenTextures(1, &newTexture->m_handle);
     glBindTexture(GL_TEXTURE_2D, newTexture->m_handle);
@@ -1020,7 +1044,12 @@ ysError ysOpenGLDevice::CreateTexture(ysTexture **texture, int width, int height
     *texture = nullptr;
 
     ysOpenGLTexture *newTexture = m_textures.NewGeneric<ysOpenGLTexture>();
+
+#if defined(_MSC_VER)
     strcpy_s(newTexture->m_filename, 257, "");
+#elif defined(__GNUC__)
+    strncpy(newTexture->m_filename, "", 257);
+#endif
 
     glGenTextures(1, &newTexture->m_handle);
     glBindTexture(GL_TEXTURE_2D, newTexture->m_handle);
@@ -1050,7 +1079,12 @@ ysError ysOpenGLDevice::CreateAlphaTexture(ysTexture **texture, int width, int h
     *texture = nullptr;
 
     ysOpenGLTexture *newTexture = m_textures.NewGeneric<ysOpenGLTexture>();
+
+#if defined(_MSC_VER)
     strcpy_s(newTexture->m_filename, 257, "");
+#elif defined(__GNUC__)
+    strncpy(newTexture->m_filename, "", 257);
+#endif
 
     glGenTextures(1, &newTexture->m_handle);
     glBindTexture(GL_TEXTURE_2D, newTexture->m_handle);
