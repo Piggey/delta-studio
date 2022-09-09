@@ -6,6 +6,10 @@
 
 #include <memory>
 
+#if defined(__GNUC__)
+    #include <cstring>
+#endif
+
 class ysDynamicArrayElement {
 public:
     ysDynamicArrayElement() {
