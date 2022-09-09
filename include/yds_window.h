@@ -41,6 +41,7 @@ public:
 
     void RestoreWindow();
 
+    const char* GetTitle() const { return m_title; }
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
     virtual int GetScreenWidth() const { return m_width; }
