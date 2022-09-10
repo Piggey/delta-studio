@@ -258,19 +258,26 @@ if(UNIX)
     # use system's OpenGL library
     if (POLICY CMP0072)
         cmake_policy(SET CMP0072 NEW)
-    endif ()
+    endif()
     find_package(OpenGL REQUIRED)
 
     # DXVK replacement for D3D10?
     set(DELTA_CORE_SOURCE_FILES_LINUX
             include/yds_unix_defs.h
+
+            # OpenAL audio library
             include/yds_al_system.h src/yds_al_system.cpp
             include/yds_al_device.h src/yds_al_device.cpp
             include/yds_al_audio_buffer.h src/yds_al_audio_buffer.cpp
             include/yds_al_audio_source.h src/yds_al_audio_source.cpp
+
+            # window creation and handling with SDL2
+            src/yds_unix_window_system.cpp include/yds_unix_window_system.h
+            src/yds_unix_window.cpp include/yds_unix_window.h
+            src/yds_unix_monitor.cpp include/yds_unix_monitor.h
     )
 
-    # set(DELTA_CORE_SOURCE_FILES ${DELTA_CORE_SOURCE_FILES} ${DELTA_CORE_SOURCE_FILES_LINUX})
+    set(DELTA_CORE_SOURCE_FILES ${DELTA_CORE_SOURCE_FILES} ${DELTA_CORE_SOURCE_FILES_LINUX})
 elseif(WIN32)
     set(DELTA_CORE_SOURCE_FILES_WINDOWS
             # DirectSound
