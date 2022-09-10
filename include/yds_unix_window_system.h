@@ -3,7 +3,6 @@
 
 #include "yds_window_system.h"
 
-#include <SDL2/SDL.h>
 
 class ysUnixWindowSystem : public ysWindowSystem {
 public:
@@ -21,7 +20,6 @@ public:
     void ConfineCursor(const ysWindow *window) override;
     void ReleaseCursor(const ysWindow *window) override;
     void SetCursorVisible(bool visible) override;
-
 };
 
 

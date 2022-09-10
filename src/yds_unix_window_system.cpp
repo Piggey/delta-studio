@@ -3,6 +3,10 @@
 #include "../include/yds_unix_window.h"
 #include "../include/yds_unix_monitor.h"
 
+#include <string>
+
+#include <SDL2/SDL.h>
+
 ysUnixWindowSystem::ysUnixWindowSystem() : ysWindowSystem(Platform::Linux) {
 }
 
