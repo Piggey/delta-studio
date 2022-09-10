@@ -21,11 +21,13 @@ delta_demo::MultipleWindowDemo::~MultipleWindowDemo() {
 void delta_demo::MultipleWindowDemo::Initialize(void *instance, ysContextObject::DeviceAPI api) {
     ysError result;
 
-    result =
-        ysWindowSystem::CreateWindowSystem(&m_windowSystem, ysWindowSystemObject::Platform::Windows);
+    result = ysWindowSystem::CreateWindowSystem(
+            &m_windowSystem,
+            ysWindowSystemObject::Platform::Windows
+    );
     if (result != ysError::None) return;
 
-    m_windowSystem->ConnectInstance(instance);
+    // m_windowSystem->ConnectInstance(instance);
 
     result = m_windowSystem->NewWindow(&m_window1);
     if (result != ysError::None) return;

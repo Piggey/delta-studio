@@ -100,7 +100,9 @@ ysError dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings
 
     // Create the window system
     YDS_NESTED_ERROR_CALL(ysWindowSystem::CreateWindowSystem(&m_windowSystem, settings.platform));
-    // m_windowSystem->ConnectInstance(settings.Instance);
+
+    // windows specific, not sure why its here
+    /* m_windowSystem->ConnectInstance(settings.Instance); */
 
     // Find the monitor setup
     m_windowSystem->SurveyMonitors();
@@ -108,16 +110,19 @@ ysError dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings
 
     // Create the game window
     YDS_NESTED_ERROR_CALL(m_windowSystem->NewWindow(&m_gameWindow));
-    YDS_NESTED_ERROR_CALL(m_gameWindow->InitializeWindow(
-        nullptr,
-        settings.WindowTitle,
-        settings.WindowStyle,
-        settings.WindowPositionX, settings.WindowPositionY,
-        settings.WindowWidth, settings.WindowHeight,
-        mainMonitor));
+    YDS_NESTED_ERROR_CALL(
+            m_gameWindow->InitializeWindow(
+                nullptr,
+                settings.WindowTitle,
+                settings.WindowStyle,
+                settings.WindowPositionX, settings.WindowPositionY,
+                settings.WindowWidth, settings.WindowHeight,
+                mainMonitor
+            )
+    );
     m_gameWindow->AttachEventHandler(&m_windowHandler);
 
-    YDS_NESTED_ERROR_CALL(ysInputSystem::CreateInputSystem(&m_inputSystem, ysWindowSystemObject::Platform::Windows));
+    YDS_NESTED_ERROR_CALL(ysInputSystem::CreateInputSystem(&m_inputSystem, settings.platform));
     m_windowSystem->AssignInputSystem(m_inputSystem);
     m_inputSystem->Initialize();
 
@@ -192,13 +197,13 @@ ysError dbasic::DeltaEngine::StartFrame() {
     if (m_gameWindow->IsActive()) {
         m_windowSystem->SetCursorVisible(!m_cursorHidden);
         if (m_cursorPositionLocked) {
-            m_windowSystem->ReleaseCursor();
+            m_windowSystem->ReleaseCursor(m_gameWindow);
             m_windowSystem->ConfineCursor(m_gameWindow);
         }
     }
     else {
         m_windowSystem->SetCursorVisible(true);
-        m_windowSystem->ReleaseCursor();
+        m_windowSystem->ReleaseCursor(m_gameWindow);
     }
 
     return YDS_ERROR_RETURN(ysError::None);
