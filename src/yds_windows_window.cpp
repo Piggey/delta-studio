@@ -30,7 +30,8 @@ ATOM ysWindowsWindow::RegisterWindowsClass() {
     return RegisterClassEx(&wc);
 }
 
-ysError ysWindowsWindow::InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor) {
+ysError ysWindowsWindow::InitializeWindow(ysWindow *parent, const char *title, WindowStyle style,
+                                          int x, int y, int width, int height, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
 
     if (!CheckCompatibility(parent)) return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
