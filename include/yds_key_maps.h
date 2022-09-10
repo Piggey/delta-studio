@@ -9,6 +9,7 @@ public:
     ~ysKeyMaps() {}
 
     static const ysKey::Code *GetWindowsKeyMap();
+    static const ysKey::Code *GetUnixKeyMap();
 
 protected:
     static ysKey::Code *m_keyMap;
