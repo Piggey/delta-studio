@@ -1,5 +1,15 @@
 ![Alt text](docs/public/banner_v2.png?raw=true)
 
+# things to do 
+not sure whether to keep WinAPI or just substitute it with open source and cross-platform libraries to be honest.
+
+anyway
+- [ ] audio library sadsadkajhflkjdsgioeurhygiruthnpkgb
+- [x] create `ysUnixWindowSystem` class (like `ysWindowsWindowSystem`)
+- [x] create `ysUnixWindow` class (like `ysWindowsWindow`)
+- [x] create `ysUnixMonitor` class (uhhhhhhhhhhhhhh)
+- [ ] a way to provide `GameEngineSetting` struct with used Platform
+- [ ] implementation of `SurveyMonitors()` in `ysUnixWindowSystem`
 ## Building the Code
 
 As this codebase is currently not ready for release, I can't make any guarantees about whether it will build for you. However, the process is pretty straightforward for anyone who wants to try:
