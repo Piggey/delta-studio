@@ -2,8 +2,6 @@
 
 #include <sstream>
 
-void init(void* instance, const ysContextObject::DeviceAPI& api, const ysWindowSystemObject::Platform& platform);
-
 delta_demo::DeltaBasicDemoApplication::DeltaBasicDemoApplication() {
     m_demoTexture = nullptr;
 }
@@ -229,9 +227,4 @@ void delta_demo::DeltaBasicDemoApplication::Destroy() {
     m_shaders.Destroy();
     m_assetManager.Destroy();
     m_engine.Destroy();
-}
-
-
-void init(void* instance, const ysContextObject::DeviceAPI& api, const ysWindowSystemObject::Platform& platform) {
-    
 }

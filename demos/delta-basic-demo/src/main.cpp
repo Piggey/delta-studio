@@ -24,8 +24,6 @@ int WINAPI WinMain(
     return 0;
 }
 #else
-    #include <SDL2/SDL.h>
-
     int main (int argc, char *argv[]) {
         auto api = ysContextObject::DeviceAPI::OpenGL4_0;
         auto demo = delta_demo::DemoApplication::Demo::DeltaBasicDemo;
@@ -37,5 +35,4 @@ int WINAPI WinMain(
 
         return 0;
     }
-    
 #endif
