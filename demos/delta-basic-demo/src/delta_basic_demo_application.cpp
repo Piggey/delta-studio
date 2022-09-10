@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+void init(void* instance, const ysContextObject::DeviceAPI& api, const ysWindowSystemObject::Platform& platform);
+
 delta_demo::DeltaBasicDemoApplication::DeltaBasicDemoApplication() {
     m_demoTexture = nullptr;
 }
@@ -10,10 +12,11 @@ delta_demo::DeltaBasicDemoApplication::~DeltaBasicDemoApplication() {
     /* void */
 }
 
-void delta_demo::DeltaBasicDemoApplication::Initialize(void *instance, ysContextObject::DeviceAPI api) {
+void delta_demo::DeltaBasicDemoApplication::Initialize(void *instance, const ysContextObject::DeviceAPI& api) {
     m_engine.GetConsole()->SetDefaultFontDirectory("../../../engines/basic/fonts/");
 
     dbasic::DeltaEngine::GameEngineSettings settings;
+    settings.platform = ysWindowSystemObject::Platform::Linux; // for now
     settings.API = api;
     settings.DepthBuffer = true;
     settings.Instance = instance;
@@ -226,4 +229,9 @@ void delta_demo::DeltaBasicDemoApplication::Destroy() {
     m_shaders.Destroy();
     m_assetManager.Destroy();
     m_engine.Destroy();
+}
+
+
+void init(void* instance, const ysContextObject::DeviceAPI& api, const ysWindowSystemObject::Platform& platform) {
+    
 }

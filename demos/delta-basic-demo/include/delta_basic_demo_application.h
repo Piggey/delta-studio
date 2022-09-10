@@ -12,7 +12,7 @@ namespace delta_demo {
         DeltaBasicDemoApplication();
         virtual ~DeltaBasicDemoApplication();
 
-        virtual void Initialize(void *instance, ysContextObject::DeviceAPI api);
+        virtual void Initialize(void *instance, const ysContextObject::DeviceAPI& api);
         virtual void Run();
         virtual void Destroy();
 
