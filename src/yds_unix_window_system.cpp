@@ -33,8 +33,33 @@ ysMonitor *ysUnixWindowSystem::NewMonitor() {
 void ysUnixWindowSystem::SurveyMonitors() {
     ysWindowSystem::SurveyMonitors();
 
-    // honestly i dont even know if the windows version is doing anything
-    // the information isnt even stored anywhere
+    printf("BULLSHIT DEBUG TIME\n");
+    int displayCount = SDL_GetNumVideoDisplays();
+    for (int displayIndex = 0; displayIndex < displayCount; displayIndex++) {
+        ysMonitor* newMonitor = NewMonitor();
+
+        // since SDL doesnt really hold any information about device name?
+        std::string deviceName = "Monitor " + std::to_string(displayIndex);
+
+        SDL_DisplayMode displayMode;
+        SDL_GetCurrentDisplayMode(displayIndex, &displayMode);
+
+        SDL_Rect displayBounds;
+        SDL_GetDisplayBounds(displayIndex, &displayBounds);
+
+        newMonitor->SetIndex(displayIndex);
+        newMonitor->SetDeviceName(deviceName.c_str());
+        newMonitor->SetOrigin(displayBounds.x, displayBounds.y);
+        newMonitor->SetLogicalSize(displayBounds.w, displayBounds.h);
+        newMonitor->SetPhysicalSize(displayMode.w, displayMode.h);
+
+        printf("%s\n", deviceName.c_str());
+        printf("- index: %d\n- origin point: [%d, %d]\n- logical size: %dx%d\n- physical size: %dx%d\n",
+               displayIndex,
+               displayBounds.x, displayBounds.y,
+               displayBounds.w, displayBounds.h,
+               displayMode.w, displayMode.h);
+    }
 }
 
 void ysUnixWindowSystem::ProcessMessages() {
@@ -64,7 +89,7 @@ void ysUnixWindowSystem::ReleaseCursor(const ysWindow *window) {
     ysWindowSystem::ReleaseCursor(window);
 
     auto* unixWindow = dynamic_cast<const ysUnixWindow*>(window);
-    SDL_SetWindowMouseRect(unixWindow->m_sdl_window, NULL);
+    SDL_SetWindowMouseRect(unixWindow->m_sdl_window, nullptr);
 }
 
 void ysUnixWindowSystem::SetCursorPosition(int x, int y) {
