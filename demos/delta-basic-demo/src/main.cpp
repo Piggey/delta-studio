@@ -31,7 +31,7 @@ int WINAPI WinMain(
         auto demo = delta_demo::DemoApplication::Demo::DeltaBasicDemo;
         auto* app = delta_demo::CreateApplication(demo);
 
-        app->Initialize(api);
+        app->Initialize(nullptr, api);
         app->Run();
         app->Destroy();
 
