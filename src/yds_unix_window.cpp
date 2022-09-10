@@ -17,10 +17,10 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWi
 
     YDS_NESTED_ERROR_CALL(ysWindow::InitializeWindow(parent, title, style, x, y, width, height, monitor));
 
-    auto* parentWindow = dynamic_cast<ysUnixWindow*>(parent);
-
     // init a window using SDL2
-    SDL_Init(SDL_INIT_VIDEO);
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        return YDS_ERROR_RETURN(ysError::ApiError);
+    }
 
     // actually create a window
     m_sdl_window = SDL_CreateWindow(
@@ -29,6 +29,10 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWi
             width, height,
             SDL_WINDOW_SHOWN
     );
+
+    if (m_sdl_window == NULL) {
+        return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
+    }
 
     return YDS_ERROR_RETURN(ysError::None);
 }
