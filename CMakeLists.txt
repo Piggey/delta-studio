@@ -253,7 +253,7 @@ set(LINUX_SUPPORT_SOON_TM
 
 # platform specific libraries and stuff
 if(UNIX)
-    find_package(OpenAL REQUIRED) # instead of DirectSound library
+    # find_package(OpenAL REQUIRED) # instead of DirectSound library
 
     # use system's OpenGL library
     if (POLICY CMP0072)
@@ -265,16 +265,15 @@ if(UNIX)
     set(DELTA_CORE_SOURCE_FILES_LINUX
             include/yds_unix_defs.h
 
-            # OpenAL audio library
-            include/yds_al_system.h src/yds_al_system.cpp
-            include/yds_al_device.h src/yds_al_device.cpp
-            include/yds_al_audio_buffer.h src/yds_al_audio_buffer.cpp
-            include/yds_al_audio_source.h src/yds_al_audio_source.cpp
-
             # window creation and handling with SDL2
             src/yds_unix_window_system.cpp include/yds_unix_window_system.h
             src/yds_unix_window.cpp include/yds_unix_window.h
             src/yds_unix_monitor.cpp include/yds_unix_monitor.h
+
+            # input devices
+            src/yds_unix_input_system.cpp include/yds_unix_input_system.h
+            src/yds_unix_input_device.cpp include/yds_unix_input_device.h
+            src/yds_unix_key_maps.cpp
     )
 
     set(DELTA_CORE_SOURCE_FILES ${DELTA_CORE_SOURCE_FILES} ${DELTA_CORE_SOURCE_FILES_LINUX})
@@ -324,18 +323,10 @@ add_library(delta-core STATIC ${DELTA_CORE_SOURCE_FILES})
 
 if(UNIX)
     target_link_libraries(delta-core PUBLIC
-        # SDL
         ${SDL2_LIBRARY}
         ${SDL2_IMAGE_LIBRARIES}
-
-        # OpenGL
         OpenGL
-
-        # Boost
         Boost::filesystem
-
-        # OpenAL
-        ${OPENAL_LIBRARY}
 )
 
 else(WIN32)
