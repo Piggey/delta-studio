@@ -99,8 +99,8 @@ ysError dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings
     YDS_ERROR_DECLARE("CreateGameWindow");
 
     // Create the window system
-    YDS_NESTED_ERROR_CALL(ysWindowSystem::CreateWindowSystem(&m_windowSystem, ysWindowSystemObject::Platform::Windows));
-    m_windowSystem->ConnectInstance(settings.Instance);
+    YDS_NESTED_ERROR_CALL(ysWindowSystem::CreateWindowSystem(&m_windowSystem, settings.platform));
+    // m_windowSystem->ConnectInstance(settings.Instance);
 
     // Find the monitor setup
     m_windowSystem->SurveyMonitors();
