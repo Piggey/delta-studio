@@ -7,12 +7,20 @@
         #define __forceinline inline
     #endif
 
+    #if !defined(_aligned_malloc) && !defined(_aligned_free)
+        #include <cstdlib>
+        #define _aligned_malloc(size, alignment) aligned_alloc(alignment, size)
+        #define _aligned_free free
+    #endif
+
+
     #ifndef strcpy_s
         #include <cstring>
-        // strncpy does not create null byte if souce is longer than dest, so we do it manually just in case
-        #define strcpy_s(dest, size, source) do {   \
-            strncpy(dest, source, size);            \
-            dest[size - 1] = '\0';                  \
+        // strncpy does not create null byte if source is longer than dest, so we do it manually just in case
+        #define strcpy_s(dest, maxSize, source) do {    \
+            strncpy(dest, source, maxSize);             \
+            if (strlen(source) > maxSize)               \
+                dest[maxSize - 1] = '\0';               \
         } while(false);
     #endif
 

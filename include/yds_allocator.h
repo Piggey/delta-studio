@@ -1,15 +1,9 @@
 #ifndef YDS_ALLOCATOR_H
 #define YDS_ALLOCATOR_H
 
-#if defined(__GNUC__)
-    #include <stdlib.h>
+#include "yds_unix_defs.h"
 
-    #define _aligned_malloc aligned_alloc
-    #define _aligned_free free
-
-#elif defined(_MSC_VER)
-    #include <malloc.h>
-#endif
+#include <malloc.h>
 
 class ysAllocator {
 public:
@@ -17,11 +11,6 @@ public:
     static void *BlockAllocate(int size) {
         return ::_aligned_malloc(size, Alignment);
     }
-
-    // template <>
-    // static void *BlockAllocate<1>(int size) {
-    //     return ::malloc(size);
-    // }
 
     static void BlockFree(void *block, int alignment) {
         if (alignment != 1) {
