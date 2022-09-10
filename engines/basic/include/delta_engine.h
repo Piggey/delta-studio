@@ -45,6 +45,7 @@ namespace dbasic {
             void *Instance = nullptr;
             ysWindow::WindowStyle WindowStyle = ysWindow::WindowStyle::Windowed;
             ysContextObject::DeviceAPI API = ysContextObject::DeviceAPI::DirectX11;
+            ysWindowSystemObject::Platform platform = ysWindowSystemObject::Platform::Windows;
             const char *ShaderDirectory = "../DeltaEngineTullahoma/Shaders/";
             const char *LoggingDirectory = "";
             bool DepthBuffer = true;
