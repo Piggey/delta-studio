@@ -4,7 +4,7 @@
 
 #if defined(_MSC_VER)
     #include "../include/yds_windows_window_system.h"
-#else
+#elif defined(__GNUC__)
     #include "../include/yds_unix_window_system.h"
 #endif
 

@@ -5,8 +5,8 @@
 #include <cmath>
 
 ysMonitor::ysMonitor() : ysWindowSystemObject("DISPLAY_MONITOR", Platform::Windows) {
-    m_maxDeviceNameLength = 0;
-    m_deviceName = 0;
+    m_maxDeviceNameLength = 256;
+    m_deviceName = new char[m_maxDeviceNameLength];
 
     m_originx = 0;
     m_originy = 0;
@@ -19,8 +19,8 @@ ysMonitor::ysMonitor() : ysWindowSystemObject("DISPLAY_MONITOR", Platform::Windo
 }
 
 ysMonitor::ysMonitor(Platform platform) : ysWindowSystemObject("DISPLAY_MONITOR", platform) {
-    m_maxDeviceNameLength = 0;
-    m_deviceName = 0;
+    m_maxDeviceNameLength = 256;
+    m_deviceName = new char[m_maxDeviceNameLength];
 
     m_originx = 0;
     m_originy = 0;
@@ -33,7 +33,7 @@ ysMonitor::ysMonitor(Platform platform) : ysWindowSystemObject("DISPLAY_MONITOR"
 }
 
 ysMonitor::~ysMonitor() {
-    if (m_deviceName) delete[] m_deviceName;
+    delete[] m_deviceName;
 }
 
 void ysMonitor::InitializeDeviceName(int maxLength) {

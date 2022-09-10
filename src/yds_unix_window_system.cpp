@@ -4,14 +4,16 @@
 #include "../include/yds_unix_monitor.h"
 
 #include <string>
-
 #include <SDL2/SDL.h>
 
 ysUnixWindowSystem::ysUnixWindowSystem() : ysWindowSystem(Platform::Linux) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        fprintf(stderr, "ysUnixWindowSystem(): could not initialize SDL video system.\n%s\n", SDL_GetError());
+    }
 }
 
 ysUnixWindowSystem::~ysUnixWindowSystem() {
-
+    SDL_Quit();
 }
 
 ysError ysUnixWindowSystem::NewWindow(ysWindow **newWindow) {
@@ -33,7 +35,6 @@ ysMonitor *ysUnixWindowSystem::NewMonitor() {
 void ysUnixWindowSystem::SurveyMonitors() {
     ysWindowSystem::SurveyMonitors();
 
-    printf("BULLSHIT DEBUG TIME\n");
     int displayCount = SDL_GetNumVideoDisplays();
     for (int displayIndex = 0; displayIndex < displayCount; displayIndex++) {
         ysMonitor* newMonitor = NewMonitor();
@@ -52,13 +53,6 @@ void ysUnixWindowSystem::SurveyMonitors() {
         newMonitor->SetOrigin(displayBounds.x, displayBounds.y);
         newMonitor->SetLogicalSize(displayBounds.w, displayBounds.h);
         newMonitor->SetPhysicalSize(displayMode.w, displayMode.h);
-
-        printf("%s\n", deviceName.c_str());
-        printf("- index: %d\n- origin point: [%d, %d]\n- logical size: %dx%d\n- physical size: %dx%d\n",
-               displayIndex,
-               displayBounds.x, displayBounds.y,
-               displayBounds.w, displayBounds.h,
-               displayMode.w, displayMode.h);
     }
 }
 

@@ -17,11 +17,7 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWi
 
     YDS_NESTED_ERROR_CALL(ysWindow::InitializeWindow(parent, title, style, x, y, width, height, monitor));
 
-    // init a window using SDL2
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        return YDS_ERROR_RETURN(ysError::ApiError);
-    }
-
+    // SDL2 should be initialized by now
     // actually create a window
     m_sdl_window = SDL_CreateWindow(
             title,
@@ -30,7 +26,7 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWi
             SDL_WINDOW_SHOWN
     );
 
-    if (m_sdl_window == NULL) {
+    if (m_sdl_window == nullptr) {
         return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
     }
 
