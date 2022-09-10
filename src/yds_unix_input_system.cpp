@@ -1,7 +1,7 @@
-#include "yds_unix_input_system.h"
+#include "../include/yds_unix_input_system.h"
 
-#include "yds_unix_input_device.h"
-#include "yds_key_maps.h"
+#include "../include/yds_unix_input_device.h"
+#include "../include/yds_key_maps.h"
 
 #include <SDL2/SDL_hidapi.h>
 
@@ -20,7 +20,6 @@ ysError ysUnixInputSystem::CheckDeviceStatus(ysInputDevice *device) {
         return YDS_ERROR_RETURN(ysError::InvalidParameter);
 
     auto *unixDevice = dynamic_cast<ysUnixInputDevice*>(device);
-
     auto* deviceInfoList = SDL_hid_enumerate(unixDevice->m_vendorID, unixDevice->m_productID);
 
     if (deviceInfoList == nullptr) {
@@ -41,7 +40,12 @@ ysError ysUnixInputSystem::CheckAllDevices() {
 }
 
 ysError ysUnixInputSystem::CreateDevices() {
-    return ysError::TestError;
+    YDS_ERROR_DECLARE("CreateDevices");
+
+    CreateDevice(ysInputDevice::InputDeviceType::KEYBOARD, 0);
+    CreateDevice(ysInputDevice::InputDeviceType::MOUSE, 0);
+
+    return YDS_ERROR_RETURN(ysError::None);
 }
 
 ysInputDevice *ysUnixInputSystem::CreateDevice(ysInputDevice::InputDeviceType type, int id) {
@@ -78,10 +82,9 @@ ysInputDevice *ysUnixInputSystem::CreateDevice(ysInputDevice::InputDeviceType ty
 
     if (type == ysInputDevice::InputDeviceType::KEYBOARD) {
         ysKeyboard *keyboard = newDevice->GetAsKeyboard();
-        keyboard->RegisterKeyMap(ysKeyMaps::GetLinuxKeyMap());
+        keyboard->RegisterKeyMap(ysKeyMaps::GetUnixKeyMap());
     }
 
     RegisterDevice(newDevice);
-
     return newDevice;
 }

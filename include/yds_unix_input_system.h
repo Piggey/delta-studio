@@ -1,14 +1,20 @@
-//
-// Created by piggey on 10.09.22.
-//
+#ifndef YDS_UNIX_INPUT_SYSTEM_H
+#define YDS_UNIX_INPUT_SYSTEM_H
 
-#ifndef DELTA_STUDIO_YDS_UNIX_INPUT_SYSTEM_H
-#define DELTA_STUDIO_YDS_UNIX_INPUT_SYSTEM_H
+#include "yds_input_system.h"
 
+class ysUnixInputSystem : public ysInputSystem {
+public:
+    ysUnixInputSystem();
+    ~ysUnixInputSystem() override;
 
-class yds_unix_input_system {
+    ysError CheckDeviceStatus(ysInputDevice *device) override;
+    ysError CheckAllDevices() override;
 
+protected:
+    ysInputDevice *CreateDevice(ysInputDevice::InputDeviceType type, int id) override;
+    ysError CreateDevices() override;
 };
 
 
-#endif //DELTA_STUDIO_YDS_UNIX_INPUT_SYSTEM_H
+#endif //YDS_UNIX_INPUT_SYSTEM_H

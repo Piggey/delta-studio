@@ -1,8 +1,10 @@
 #include "../include/yds_input_system.h"
-
 #include "../include/yds_window_system.h"
+
 #if defined(_MSC_VER)
     #include "../include/yds_windows_input_system.h"
+#elif defined(__GNUC__)
+    #include "../include/yds_unix_input_system.h"
 #endif
 
 ysInputSystem::ysInputSystem() : ysWindowSystemObject("INPUT_SYSTEM", Platform::Unknown) {
@@ -22,8 +24,8 @@ ysInputSystem::~ysInputSystem() {
 ysError ysInputSystem::CreateInputSystem(ysInputSystem **newInputSystem, Platform platform) {
     YDS_ERROR_DECLARE("CreateInputSystem");
 
-    if (newInputSystem == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
-    *newInputSystem = nullptr;
+    if (newInputSystem == nullptr)
+        return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
     if (platform == Platform::Unknown) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
@@ -32,8 +34,11 @@ ysError ysInputSystem::CreateInputSystem(ysInputSystem **newInputSystem, Platfor
     case Platform::Windows:
         *newInputSystem = new ysWindowsInputSystem;
         break;
+#elif defined(__GNUC__)
+    case Platform::Linux:
+        *newInputSystem = new ysUnixInputSystem;
+        break;
 #endif
-
     default:
         *newInputSystem = nullptr;
         break;

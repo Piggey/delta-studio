@@ -1,4 +1,4 @@
-#include "yds_unix_input_device.h"
+#include "../include/yds_unix_input_device.h"
 
 ysUnixInputDevice::ysUnixInputDevice() : ysInputDevice(Platform::Linux, InputDeviceType::UNKNOWN) {
 
