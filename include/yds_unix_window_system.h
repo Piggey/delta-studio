@@ -1,14 +1,28 @@
-//
-// Created by piggey on 09.09.22.
-//
+#ifndef YDS_UNIX_WINDOW_SYSTEM_H
+#define YDS_UNIX_WINDOW_SYSTEM_H
 
-#ifndef DELTA_STUDIO_YDS_UNIX_WINDOW_SYSTEM_H
-#define DELTA_STUDIO_YDS_UNIX_WINDOW_SYSTEM_H
+#include "yds_window_system.h"
 
+#include <SDL2/SDL.h>
 
-class yds_unix_window_system {
+class ysUnixWindowSystem : public ysWindowSystem {
+public:
+    ysUnixWindowSystem();
+    ~ysUnixWindowSystem() override;
+
+    ysError NewWindow(ysWindow **newWindow) override;
+
+    ysMonitor *NewMonitor() override;
+    void SurveyMonitors() override;
+
+    void ProcessMessages() override;
+
+    void SetCursorPosition(int x, int y) override;
+    void ConfineCursor(const ysWindow *window) override;
+    void ReleaseCursor(const ysWindow *window) override;
+    void SetCursorVisible(bool visible) override;
 
 };
 
 
-#endif //DELTA_STUDIO_YDS_UNIX_WINDOW_SYSTEM_H
+#endif //YDS_UNIX_WINDOW_SYSTEM_H

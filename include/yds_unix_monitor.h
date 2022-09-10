@@ -1,14 +1,13 @@
-//
-// Created by piggey on 10.09.22.
-//
+#ifndef YDS_UNIX_MONITOR_H
+#define YDS_UNIX_MONITOR_H
 
-#ifndef DELTA_STUDIO_YDS_UNIX_MONITOR_H
-#define DELTA_STUDIO_YDS_UNIX_MONITOR_H
+#include "yds_monitor.h"
 
-
-class yds_unix_monitor {
-
+class ysUnixMonitor : public ysMonitor {
+public:
+    ysUnixMonitor();
+    ~ysUnixMonitor() override;
 };
 
 
-#endif //DELTA_STUDIO_YDS_UNIX_MONITOR_H
+#endif //YDS_UNIX_MONITOR_H

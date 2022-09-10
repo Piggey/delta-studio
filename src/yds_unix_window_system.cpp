@@ -1,7 +1,7 @@
-#include "yds_unix_window_system.h"
+#include "../include/yds_unix_window_system.h"
 
-#include "yds_unix_window.h"
-#include "yds_unix_monitor.h"
+#include "../include/yds_unix_window.h"
+#include "../include/yds_unix_monitor.h"
 
 ysUnixWindowSystem::ysUnixWindowSystem() : ysWindowSystem(Platform::Linux) {
 }

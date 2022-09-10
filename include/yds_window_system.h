@@ -31,8 +31,8 @@ public:
 
     virtual void SetCursorPosition(int x, int y) { /* void */ }
 
-    virtual void ConfineCursor(ysWindow *window) { m_cursorConfined = true; }
-    virtual void ReleaseCursor() { m_cursorConfined = false; }
+    virtual void ConfineCursor(const ysWindow *window) { m_cursorConfined = true; }
+    virtual void ReleaseCursor(const ysWindow *window) { m_cursorConfined = false; }
     bool IsCursorConfined() const { return m_cursorConfined; }
 
     virtual void SetCursorVisible(bool visible) { m_cursorVisible = visible; }
@@ -56,8 +56,6 @@ public:
 
     ysError AssignInputSystem(ysInputSystem *system);
     ysInputSystem *GetInputSystem() { return m_inputSystem; }
-
-    virtual void ConnectInstance(void *genericInstanceConnection) { (void)genericInstanceConnection; }
 
 protected:
     ysDynamicArray<ysMonitor, 4> m_monitorArray;

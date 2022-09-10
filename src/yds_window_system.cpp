@@ -4,6 +4,8 @@
 
 #if defined(_MSC_VER)
     #include "../include/yds_windows_window_system.h"
+#else
+    #include "../include/yds_unix_window_system.h"
 #endif
 
 ysWindowSystem *ysWindowSystem::g_instance = nullptr;
@@ -41,17 +43,23 @@ ysWindowSystem::~ysWindowSystem() {
 ysError ysWindowSystem::CreateWindowSystem(ysWindowSystem **newSystem, Platform platform) {
     YDS_ERROR_DECLARE("CreateWindowSystem");
 
-    if (newSystem == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
-    *newSystem = nullptr;
+    if (newSystem == nullptr) 
+        return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
-    if (platform == Platform::Unknown) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
-    if (g_instance != nullptr) return YDS_ERROR_RETURN_STATIC(ysError::MultipleErrorSystems);
+    if (platform == Platform::Unknown)
+        return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
+
+    if (g_instance != nullptr) 
+        return YDS_ERROR_RETURN_STATIC(ysError::MultipleErrorSystems);
 
     switch (platform) {
 #if defined(_MSC_VER)
     case Platform::Windows:
         *newSystem = new ysWindowsWindowSystem();
         break;
+#else
+    case Platform::Linux:
+        *newSystem = new ysUnixWindowSystem();
 #endif
     default:
         break;
