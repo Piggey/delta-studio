@@ -73,7 +73,7 @@ void ysUnixWindowSystem::ConfineCursor(const ysWindow *window) {
     rect.h = window->GetScreenHeight();
 
     auto* unixWindow = dynamic_cast<const ysUnixWindow*>(window);
-    SDL_SetWindowMouseRect(unixWindow->m_sdl_window, &rect);
+    SDL_SetWindowMouseRect(unixWindow->m_sdlWindow, &rect);
 }
 
 void ysUnixWindowSystem::ReleaseCursor(const ysWindow *window) {
@@ -83,7 +83,7 @@ void ysUnixWindowSystem::ReleaseCursor(const ysWindow *window) {
     ysWindowSystem::ReleaseCursor(window);
 
     auto* unixWindow = dynamic_cast<const ysUnixWindow*>(window);
-    SDL_SetWindowMouseRect(unixWindow->m_sdl_window, nullptr);
+    SDL_SetWindowMouseRect(unixWindow->m_sdlWindow, nullptr);
 }
 
 void ysUnixWindowSystem::SetCursorPosition(int x, int y) {

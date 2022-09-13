@@ -27,7 +27,7 @@ public:
     int GetScreenHeight() const override;
 
 private:
-    SDL_Window* m_sdl_window = nullptr;
+    SDL_Window* m_sdlWindow = nullptr;
 };
 
 

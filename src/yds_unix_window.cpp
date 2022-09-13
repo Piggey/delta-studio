@@ -5,7 +5,7 @@ ysUnixWindow::ysUnixWindow() : ysWindow(Platform::Linux) {
 }
 
 ysUnixWindow::~ysUnixWindow() {
-
+    SDL_DestroyWindow(m_sdlWindow);
 }
 
 ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWindow::WindowStyle style,
@@ -19,14 +19,14 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWi
 
     // SDL2 should be initialized by now
     // actually create a window
-    m_sdl_window = SDL_CreateWindow(
+    m_sdlWindow = SDL_CreateWindow(
             title,
             x, y,
             width, height,
             SDL_WINDOW_SHOWN
     );
 
-    if (m_sdl_window == nullptr) {
+    if (m_sdlWindow == nullptr) {
         return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
     }
 
@@ -53,7 +53,7 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title,
 }
 
 bool ysUnixWindow::SetWindowStyle(ysWindow::WindowStyle style) {
-    if (m_sdl_window == nullptr)
+    if (m_sdlWindow == nullptr)
         return false;
 
     if (!ysWindow::SetWindowStyle(style))
@@ -67,22 +67,22 @@ bool ysUnixWindow::SetWindowStyle(ysWindow::WindowStyle style) {
         const int x = GetPositionX();
         const int y = GetPositionY();
 
-        SDL_SetWindowPosition(m_sdl_window, x, y);
-        SDL_SetWindowSize(m_sdl_window, width, height);
+        SDL_SetWindowPosition(m_sdlWindow, x, y);
+        SDL_SetWindowSize(m_sdlWindow, width, height);
 
-        SDL_ShowWindow(m_sdl_window);
+        SDL_ShowWindow(m_sdlWindow);
     }
     else if (style == WindowStyle::Fullscreen) {
-        SDL_SetWindowFullscreen(m_sdl_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        SDL_SetWindowFullscreen(m_sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-        SDL_ShowWindow(m_sdl_window);
+        SDL_ShowWindow(m_sdlWindow);
     }
 
     return true;
 }
 
 void ysUnixWindow::ScreenToLocal(int &x, int &y) const {
-    if (m_sdl_window == nullptr) {
+    if (m_sdlWindow == nullptr) {
         x = y = 0;
         return;
     }
@@ -91,10 +91,10 @@ void ysUnixWindow::ScreenToLocal(int &x, int &y) const {
 }
 
 bool ysUnixWindow::IsVisible() {
-    if (m_sdl_window == nullptr)
+    if (m_sdlWindow == nullptr)
         return false;
 
-    auto flags = SDL_GetWindowFlags(m_sdl_window);
+    auto flags = SDL_GetWindowFlags(m_sdlWindow);
 
     if (flags & SDL_WINDOW_HIDDEN)
         return false;
@@ -103,21 +103,21 @@ bool ysUnixWindow::IsVisible() {
 }
 
 int ysUnixWindow::GetScreenWidth() const {
-    if (m_sdl_window == nullptr)
+    if (m_sdlWindow == nullptr)
         return 0;
 
     int w;
-    SDL_GetWindowSize(m_sdl_window, &w, nullptr);
+    SDL_GetWindowSize(m_sdlWindow, &w, nullptr);
 
     return w;
 }
 
 int ysUnixWindow::GetScreenHeight() const {
-    if (m_sdl_window == nullptr)
+    if (m_sdlWindow == nullptr)
         return 0;
 
     int h;
-    SDL_GetWindowSize(m_sdl_window, nullptr, &h);
+    SDL_GetWindowSize(m_sdlWindow, nullptr, &h);
 
     return h;
 }
