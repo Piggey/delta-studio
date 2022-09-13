@@ -1,14 +1,22 @@
-//
-// Created by piggey on 13.09.22.
-//
+#ifndef YDS_SDLA_AUDIO_BUFFER_H
+#define YDS_SDLA_AUDIO_BUFFER_H
 
-#ifndef DELTA_STUDIO_YDS_SDLA_AUDIO_BUFFER_H
-#define DELTA_STUDIO_YDS_SDLA_AUDIO_BUFFER_H
+#include "yds_audio_buffer.h"
 
+class ysSDLAAudioBuffer : public ysAudioBuffer {
+public:
+   ysSDLAAudioBuffer();
+    ~ysSDLAAudioBuffer() override;
 
-class yds_sdla_audio_buffer {
+    ysError Initialize(const SampleOffset &samples, const ysAudioParameters &parameters) override;
+    ysError EditBuffer(const void *data) override;
+    ysError EditBufferSegment(void *data, const SampleOffset &samples, const SampleOffset &offset) override;
+    ysError Destroy() override;
 
+    void *GetBuffer() const { return m_buffer; }
+
+protected:
+    void *m_buffer;
 };
 
-
-#endif //DELTA_STUDIO_YDS_SDLA_AUDIO_BUFFER_H
+#endif //YDS_SDLA_AUDIO_BUFFER_H
