@@ -46,12 +46,13 @@ namespace dbasic {
             ysWindow::WindowStyle WindowStyle = ysWindow::WindowStyle::Windowed;
             ysContextObject::DeviceAPI API = ysContextObject::DeviceAPI::DirectX11;
             ysWindowSystemObject::Platform platform = ysWindowSystemObject::Platform::Windows;
+            ysAudioSystem::API audioSystem = ysAudioSystem::API::DirectSound8;
             const char *ShaderDirectory = "../DeltaEngineTullahoma/Shaders/";
             const char *LoggingDirectory = "";
             bool DepthBuffer = true;
             bool FrameLogging = false;
-            int WindowWidth = 1920;
-            int WindowHeight = 1080;
+            int WindowWidth = 1280;
+            int WindowHeight = 720;
             int WindowPositionX = 0;
             int WindowPositionY = 0;
         };
