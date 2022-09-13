@@ -8,7 +8,7 @@ ysAudioBuffer::~ysAudioBuffer() {
     /* void */
 }
 
-ysError ysAudioBuffer::Initialize(SampleOffset samples, const ysAudioParameters &parameters) {
+ysError ysAudioBuffer::Initialize(const SampleOffset &samples, const ysAudioParameters &parameters) {
     YDS_ERROR_DECLARE("Initialize");
 
     m_audioParameters = parameters;
@@ -17,26 +17,20 @@ ysError ysAudioBuffer::Initialize(SampleOffset samples, const ysAudioParameters 
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysAudioBuffer::EditBuffer(void *data) {
+ysError ysAudioBuffer::EditBuffer(const void *data) {
     YDS_ERROR_DECLARE("EditBuffer");
-
-    /* void */
 
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysAudioBuffer::EditBufferSegment(void *data, SampleOffset samples, SampleOffset offset) {
+ysError ysAudioBuffer::EditBufferSegment(void *data, const SampleOffset &samples, const SampleOffset &offset) {
     YDS_ERROR_DECLARE("EditBufferSegment");
-
-    /* void */
 
     return YDS_ERROR_RETURN(ysError::None);
 }
 
 ysError ysAudioBuffer::Destroy() {
     YDS_ERROR_DECLARE("Destroy");
-
-    /* void */
 
     return YDS_ERROR_RETURN(ysError::None);
 }

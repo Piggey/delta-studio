@@ -10,9 +10,9 @@ public:
     ysAudioBuffer(ysAudioSystemObject::API api);
     virtual ~ysAudioBuffer();
 
-    virtual ysError Initialize(SampleOffset samples, const ysAudioParameters &parameters);
-    virtual ysError EditBuffer(void *data);
-    virtual ysError EditBufferSegment(void *data, SampleOffset samples, SampleOffset offset);
+    virtual ysError Initialize(const SampleOffset &samples, const ysAudioParameters &parameters);
+    virtual ysError EditBuffer(const void *data);
+    virtual ysError EditBufferSegment(void *data, const SampleOffset &samples, const SampleOffset &offset);
     virtual ysError Destroy();
 
     virtual SampleOffset GetSampleCount() const { return m_samples; }

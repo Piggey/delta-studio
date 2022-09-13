@@ -8,7 +8,7 @@ public:
     ysDS8AudioBuffer();
     virtual ~ysDS8AudioBuffer();
 
-    virtual ysError Initialize(SampleOffset samples, const ysAudioParameters &parameters);
+    virtual ysError Initialize(const SampleOffset &samples, const ysAudioParameters &parameters);
     virtual ysError EditBuffer(void *data);
     virtual ysError EditBufferSegment(void *data, SampleOffset samples, SampleOffset offset);
     virtual ysError Destroy();

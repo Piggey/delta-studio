@@ -8,7 +8,7 @@ ysDS8AudioBuffer::~ysDS8AudioBuffer() {
     /* void */
 }
 
-ysError ysDS8AudioBuffer::Initialize(SampleOffset samples, const ysAudioParameters &parameters) {
+ysError ysDS8AudioBuffer::Initialize(const SampleOffset &samples, const ysAudioParameters &parameters) {
     YDS_ERROR_DECLARE("Initialize");
 
     YDS_NESTED_ERROR_CALL(ysAudioBuffer::Initialize(samples, parameters));
