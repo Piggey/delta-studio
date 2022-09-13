@@ -8,7 +8,7 @@ public:
     enum class API {
         Undefined,
         DirectSound8,
-        OpenAL
+        SDLAudio
     };
 
 public:
