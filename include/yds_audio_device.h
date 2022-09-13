@@ -3,13 +3,7 @@
 
 #include "yds_audio_system_object.h"
 #include "yds_audio_parameters.h"
-
 #include "yds_window.h"
-
-#if defined(__GNUC__)
-    #define __STDC_WANT_LIB_EXT1__ 1
-    #include <string.h>
-#endif
 
 class ysAudioSource;
 class ysAudioBuffer;
@@ -22,20 +16,11 @@ public:
 
 public:
     ysAudioDevice();
-    ysAudioDevice(API api);
+    explicit ysAudioDevice(API api);
     ~ysAudioDevice();
 
     bool IsConnected() const { return m_connected; }
-    void SetDeviceName(const char *newName) {
-#if defined(__GNUC__)
-        // since safe versions of these are not really supported in C++ official standards
-        // we use the unsafe versions
-        // potential weak point?
-        strcpy(m_deviceName, newName);
-#elif defined(_MSC_VER) 
-        strcpy_s(m_deviceName, MaxDeviceNameLength, newName);
-#endif
-    }
+    void SetDeviceName(const char *newName) { strcpy_s(m_deviceName, MaxDeviceNameLength, newName); }
 
     virtual ysAudioBuffer *CreateBuffer(const ysAudioParameters *parameters, SampleOffset size) = 0;
 
