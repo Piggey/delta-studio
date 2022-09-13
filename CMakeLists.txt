@@ -274,6 +274,12 @@ if(UNIX)
             src/yds_unix_input_system.cpp include/yds_unix_input_system.h
             src/yds_unix_input_device.cpp include/yds_unix_input_device.h
             src/yds_unix_key_maps.cpp
+
+            # audio devices with SDL_audio
+            src/yds_sdla_audio_buffer.cpp include/yds_sdla_audio_buffer.h
+            src/yds_sdla_audio_source.cpp include/yds_sdla_audio_source.h
+            src/yds_sdla_device.cpp include/yds_sdla_device.h
+            src/yds_sdla_system.cpp include/yds_sdla_system.h
     )
 
     set(DELTA_CORE_SOURCE_FILES ${DELTA_CORE_SOURCE_FILES} ${DELTA_CORE_SOURCE_FILES_LINUX})
