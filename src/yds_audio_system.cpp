@@ -1,11 +1,11 @@
 #include "../include/yds_audio_system.h"
 
 #include "../include/yds_audio_device.h"
+#include "../include/yds_sdla_system.h"
 
 #if defined(_MSC_VER)
     #include "../include/yds_ds8_system.h"
 #endif
-
 
 ysAudioSystem::ysAudioSystem() : ysAudioSystemObject("AUDIO_SYSTEM", API::Undefined) {
     /* void */
@@ -22,10 +22,11 @@ ysAudioSystem::~ysAudioSystem() {
 ysError ysAudioSystem::CreateAudioSystem(ysAudioSystem **newAudioSystem, API api) {
     YDS_ERROR_DECLARE("CreateAudioSystem");
 
-    if (newAudioSystem == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
-    *newAudioSystem = nullptr;
+    if (newAudioSystem == nullptr)
+        return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
-    if (api == API::Undefined) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
+    if (api == API::Undefined)
+        return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
     switch (api) {
 #if defined(_MSC_VER)
@@ -33,6 +34,9 @@ ysError ysAudioSystem::CreateAudioSystem(ysAudioSystem **newAudioSystem, API api
         *newAudioSystem = new ysDS8System;
         break;
 #endif
+    case API::SDLAudio:
+        *newAudioSystem = new ysSDLASystem();
+        break;
     default:
         *newAudioSystem = nullptr;
         break;
@@ -44,7 +48,8 @@ ysError ysAudioSystem::CreateAudioSystem(ysAudioSystem **newAudioSystem, API api
 ysError ysAudioSystem::DestroyAudioSystem(ysAudioSystem **audioSystem) {
     YDS_ERROR_DECLARE("DestroyAudioSystem");
 
-    if (audioSystem == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
+    if (audioSystem == nullptr)
+        return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
     delete *audioSystem;
     *audioSystem = nullptr;
@@ -57,7 +62,8 @@ void ysAudioSystem::EnumerateDevices() {
 }
 
 ysAudioDevice *ysAudioSystem::GetPrimaryDevice() {
-    if (m_devices.GetNumObjects() == 0) return 0;
+    if (m_devices.GetNumObjects() == 0)
+        return nullptr;
     else {
         // Zeroeth device is always the default
         return m_devices.Get(0);
@@ -65,7 +71,9 @@ ysAudioDevice *ysAudioSystem::GetPrimaryDevice() {
 }
 
 ysAudioDevice *ysAudioSystem::GetAuxDevice(int device) {
-    if ((device + 1) >= GetDeviceCount()) return 0;
+    if ((device + 1) >= GetDeviceCount())
+        return nullptr;
+
     return m_devices.Get(device + 1);
 }
 
@@ -76,10 +84,10 @@ void ysAudioSystem::ConnectDevice(ysAudioDevice *device, ysWindow *windowAssocia
 
 void ysAudioSystem::ConnectDeviceConsole(ysAudioDevice *device) {
     device->m_connected = true;
-    device->m_windowAssociation = NULL;
+    device->m_windowAssociation = nullptr;
 }
 
 void ysAudioSystem::DisconnectDevice(ysAudioDevice *device) {
     device->m_connected = false;
-    device->m_windowAssociation = 0;
+    device->m_windowAssociation = nullptr;
 }

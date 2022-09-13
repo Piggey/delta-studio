@@ -4,15 +4,15 @@
 #include "../include/yds_audio_source.h"
 
 ysAudioDevice::ysAudioDevice() : ysAudioSystemObject("AUDIO_DEVICE", API::Undefined) {
-    m_deviceName[0] = '\0';
+    strcpy(m_deviceName, "");
     m_connected = false;
-    m_windowAssociation = 0;
+    m_windowAssociation = nullptr;
 }
 
 ysAudioDevice::ysAudioDevice(API api) : ysAudioSystemObject("ysAudioDevice", api) {
-    m_deviceName[0] = '\0';
+    strcpy(m_deviceName, "");
     m_connected = false;
-    m_windowAssociation = 0;
+    m_windowAssociation = nullptr;
 }
 
 ysAudioDevice::~ysAudioDevice() {
