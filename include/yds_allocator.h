@@ -13,18 +13,13 @@ public:
     }
 
     static void BlockFree(void *block, int alignment) {
-        if (alignment != 1) {
-            ::_aligned_free(block);
-        }
-        else {
-            ::free(block);
-        }
+        ::_aligned_free(block);
     }
 
     template <typename T_Create, int Alignment>
     static T_Create *TypeAllocate(int n = 1, bool construct = true) {
         void *block = BlockAllocate<Alignment>(sizeof(T_Create) * n);
-        T_Create *typedArray = reinterpret_cast<T_Create *>(block);
+        auto *typedArray = reinterpret_cast<T_Create *>(block);
 
         if (construct) {
             for (int i = 0; i < n; i++) {
