@@ -1,14 +1,28 @@
-//
-// Created by piggey on 13.09.22.
-//
+#ifndef YDS_SDLA_DEVICE_H
+#define YDS_SDLA_DEVICE_H
 
-#ifndef DELTA_STUDIO_YDS_SDLA_DEVICE_H
-#define DELTA_STUDIO_YDS_SDLA_DEVICE_H
+#include "yds_audio_device.h"
 
+#include <SDL2/SDL_audio.h>
 
-class yds_sdla_device {
+class ysSDLADevice : public ysAudioDevice {
+    friend class ysSDLASystem;
 
+public:
+    ysSDLADevice();
+    ~ysSDLADevice() override;
+
+    ysAudioBuffer *CreateBuffer(const ysAudioParameters *parameters, SampleOffset size) override;
+
+    ysAudioSource *CreateSource(const ysAudioParameters *parameters, SampleOffset size) override;
+    ysAudioSource *CreateSource(ysAudioBuffer *sourceBuffer) override;
+
+    void UpdateAudioSources() override;
+
+protected:
+    SDL_AudioDeviceID m_sdlaDevID;
+    SDL_AudioSpec m_sdlAudioSpec{};
 };
 
 
-#endif //DELTA_STUDIO_YDS_SDLA_DEVICE_H
+#endif //YDS_SDLA_DEVICE_H
