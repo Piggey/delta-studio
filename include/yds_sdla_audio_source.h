@@ -1,14 +1,33 @@
-//
-// Created by piggey on 13.09.22.
-//
+#ifndef YDS_SDLA_AUDIO_SOURCE_H
+#define YDS_SDLA_AUDIO_SOURCE_H
 
-#ifndef DELTA_STUDIO_YDS_SDLA_AUDIO_SOURCE_H
-#define DELTA_STUDIO_YDS_SDLA_AUDIO_SOURCE_H
+#include "yds_audio_source.h"
 
+class ysSDLAAudioSource : public ysAudioSource {
+    friend class ysSDLADevice;
 
-class yds_sdla_audio_source {
+public:
+    ysSDLAAudioSource();
+    ~ysSDLAAudioSource() override;
 
+    ysError LockEntireBuffer(void **buffer, SampleOffset *samples) override;
+    ysError UnlockBuffer(void *buffer, SampleOffset samples) override;
+
+    ysError LockBufferSegment(SampleOffset offset, SampleOffset samples, void **segment1, SampleOffset *size1, void **segment2, SampleOffset *size2) override;
+    ysError UnlockBufferSegments(void *segment1, SampleOffset segment1Size, void *segment2, SampleOffset segment2Size) override;
+
+    ysError SetMode(Mode mode) override;
+    ysError SetDataBuffer(ysAudioBuffer *buffer) override;
+    ysError SetVolume(float volume) override;
+    ysError SetPan(float pan) override;
+
+    SampleOffset GetCurrentPosition() override;
+    SampleOffset GetCurrentWritePosition() override;
+
+    void Seek(SampleOffset offset) override;
+
+    ysError Destroy() override;
 };
 
 
-#endif //DELTA_STUDIO_YDS_SDLA_AUDIO_SOURCE_H
+#endif //YDS_SDLA_AUDIO_SOURCE_H
