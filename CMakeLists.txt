@@ -128,7 +128,7 @@ set(DELTA_CORE_SOURCE_FILES
     src/yds_opengl_shader.cpp
     src/yds_opengl_shader_program.cpp
     src/yds_opengl_texture.cpp
-    src/yds_opengl_windows_context.cpp
+    src/yds_opengl_window_context.cpp
     src/yds_rendering_context.cpp
     src/yds_render_geometry_channel.cpp
     src/yds_render_geometry_format.cpp
@@ -215,7 +215,7 @@ set(DELTA_CORE_SOURCE_FILES
     include/yds_opengl_shader.h
     include/yds_opengl_shader_program.h
     include/yds_opengl_texture.h
-    include/yds_opengl_windows_context.h
+    include/yds_opengl_window_context.h
     include/yds_queue.h
     include/yds_registry.h
     include/yds_rendering_context.h
