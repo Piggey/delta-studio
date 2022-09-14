@@ -23,7 +23,7 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWi
             title,
             x, y,
             width, height,
-            SDL_WINDOW_SHOWN
+            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
     );
 
     if (m_sdlWindow == nullptr) {
@@ -121,6 +121,3 @@ int ysUnixWindow::GetScreenHeight() const {
 
     return h;
 }
-
-
-
