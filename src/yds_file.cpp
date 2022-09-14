@@ -21,7 +21,7 @@ ysError ysFile::OpenFile(const char *fname, unsigned int filemode) {
 
     strcpy_s(m_name, MAX_FILE_NAME_LENGTH, fname);
 
-    std::ios::openmode openMode;
+    auto openMode = static_cast<std::_Ios_Openmode>(0);
     if (filemode & FILE_READ)   openMode |= std::ios::in;
     else                        openMode |= std::ios::out;
     if (filemode & FILE_BINARY) openMode |= std::ios::binary;

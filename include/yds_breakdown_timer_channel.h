@@ -41,9 +41,7 @@ protected:
     uint64_t m_frameCount;
 
     bool m_midMeasurement;
-
-protected:
-    uint64_t m_lastMeasurementStart;
+    uint64_t m_lastMeasurementStart{};
 };
 
 #endif /* YDS_BREAKDOWN_TIMER_CHANNEL_H */

@@ -29,8 +29,8 @@ namespace dbasic {
 
         struct DrawCall {
             StageEnableFlags Flags = 0;
-            void *ObjectData;
-            int ObjectDataSize;
+            void *ObjectData{};
+            int ObjectDataSize{};
             ysGPUBuffer *IndexBuffer = nullptr;
             ysGPUBuffer *VertexBuffer = nullptr;
             int VertexSize = 0;
@@ -114,7 +114,7 @@ namespace dbasic {
         void GetOsMousePos(int *x, int *y);
 
         void SetCursorPositionLock(bool lock) { m_cursorPositionLocked = lock; }
-        bool GetCursorPositionLock() { return m_cursorPositionLocked; }
+        bool GetCursorPositionLock() const { return m_cursorPositionLocked; }
 
         void SetCursorHidden(bool hidden) { m_cursorHidden = hidden; }
         bool GetCursorHidden() const { return m_cursorHidden; }
@@ -177,16 +177,16 @@ namespace dbasic {
         // Shader Controls
         ShaderSet *m_shaderSet;
 
-        ysGPUBuffer *m_consoleShaderObjectVariablesBuffer;
+        ysGPUBuffer *m_consoleShaderObjectVariablesBuffer{};
         ConsoleShaderObjectVariables m_consoleShaderObjectVariables;
 
         ysShader *m_vertexShader;
-        ysShader *m_vertexSkinnedShader;
+        ysShader *m_vertexSkinnedShader{};
         ysShader *m_pixelShader;
         ysShader *m_consoleVertexShader;
         ysShader *m_consolePixelShader;
-        ysShader *m_saqVertexShader;
-        ysShader *m_saqPixelShader;
+        ysShader *m_saqVertexShader{};
+        ysShader *m_saqPixelShader{};
 
         ysShaderProgram *m_shaderProgram;
         ysShaderProgram *m_skinnedShaderProgram;
@@ -214,8 +214,8 @@ namespace dbasic {
 
     protected:
         // Settings
-        float m_clearColor[4];
-        bool m_consoleEnabled;
+        float m_clearColor[4]{};
+        bool m_consoleEnabled{};
 
         // Cursor
         bool m_cursorPositionLocked;

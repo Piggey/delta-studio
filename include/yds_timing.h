@@ -21,7 +21,7 @@ public:
 
     static ysTimingSystem *Get() { 
         if (g_instance == nullptr) {
-            g_instance = new ysTimingSystem;
+            g_instance = new ysTimingSystem();
         }
 
         return g_instance;
