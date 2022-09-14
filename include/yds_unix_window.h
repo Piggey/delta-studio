@@ -21,6 +21,7 @@ public:
 
     bool IsVisible() override;
 
+    SDL_Window *GetSDLWindow() const { return m_sdlWindow; }
     int GetScreenWidth() const override;
     int GetScreenHeight() const override;
 
