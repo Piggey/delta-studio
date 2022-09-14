@@ -15,6 +15,7 @@ void delta_demo::DeltaBasicDemoApplication::Initialize(void *instance, const ysC
 
     dbasic::DeltaEngine::GameEngineSettings settings;
     settings.platform = ysWindowSystemObject::Platform::Linux; // for now
+    settings.audioSystem = ysAudioSource::API::SDLAudio; // for now again
     settings.API = api;
     settings.DepthBuffer = true;
     settings.Instance = instance;
@@ -197,6 +198,8 @@ void delta_demo::DeltaBasicDemoApplication::Render() {
             break;
         case ysWindow::WindowStyle::Fullscreen:
             m_engine.GetGameWindow()->SetWindowStyle(ysWindow::WindowStyle::Windowed);
+            break;
+        case ysWindow::WindowStyle::Unknown:
             break;
         }
     }

@@ -47,7 +47,7 @@ ysError ysOpenGLWindowsContext::CreateRenderingContext(ysOpenGLDevice *device, y
     // generate context
     *m_context = SDL_GL_CreateContext(m_window);
 
-    if (m_context == NULL) {
+    if (m_context == nullptr) {
         fprintf(stderr, "%s\n", SDL_GetError());
         return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
     }

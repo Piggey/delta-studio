@@ -11,13 +11,13 @@
 
 class ysOpenGLDevice;
 
-class ysOpenGLWindowsContext : public ysOpenGLVirtualContext {
+class ysOpenGLWindowContext : public ysOpenGLVirtualContext {
     friend ysOpenGLDevice;
 
 public:
-    explicit ysOpenGLWindowsContext(ysWindowSystemObject::Platform platform = ysWindowSystem::Platform::Windows);
+    explicit ysOpenGLWindowContext(ysWindowSystemObject::Platform platform = ysWindowSystem::Platform::Windows);
 
-    ~ysOpenGLWindowsContext() override;
+    ~ysOpenGLWindowContext() override;
 
     ysError CreateRenderingContext(ysOpenGLDevice *device, ysWindow *window, int major, int minor);
 
