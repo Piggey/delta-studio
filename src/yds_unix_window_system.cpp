@@ -7,13 +7,13 @@
 #include <SDL2/SDL.h>
 
 ysUnixWindowSystem::ysUnixWindowSystem() : ysWindowSystem(Platform::Linux) {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "ysUnixWindowSystem(): could not initialize SDL video system.\n%s\n", SDL_GetError());
     }
 }
 
 ysUnixWindowSystem::~ysUnixWindowSystem() {
-    SDL_Quit();
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
 ysError ysUnixWindowSystem::NewWindow(ysWindow **newWindow) {
