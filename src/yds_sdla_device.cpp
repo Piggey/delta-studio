@@ -4,7 +4,7 @@
 #include "../include/yds_sdla_audio_source.h"
 
 ysSDLADevice::ysSDLADevice() : ysAudioDevice(API::SDLAudio) {
-    m_sdlaDevID = 0;
+    m_sdlDeviceID = 0;
 }
 
 ysSDLADevice::~ysSDLADevice() {
@@ -42,7 +42,7 @@ void ysSDLADevice::UpdateAudioSources() {
     const int sourceCount = m_audioSources.GetNumObjects();
     for (int i = sourceCount - 1; i >= 0; --i) {
         auto *sdlaSource = dynamic_cast<ysSDLAAudioSource*>(m_audioSources.Get(i));
-        SDL_AudioStatus deviceStatus = SDL_GetAudioDeviceStatus(m_sdlaDevID);
+        SDL_AudioStatus deviceStatus = SDL_GetAudioDeviceStatus(m_sdlDeviceID);
 
         if (sdlaSource->GetBufferMode() == ysAudioSource::Mode::PlayOnce &&
             deviceStatus != SDL_AUDIO_PLAYING) {

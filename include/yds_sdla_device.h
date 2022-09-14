@@ -20,7 +20,7 @@ public:
     void UpdateAudioSources() override;
 
 protected:
-    SDL_AudioDeviceID m_sdlaDevID;
+    SDL_AudioDeviceID m_sdlDeviceID;
     SDL_AudioSpec m_sdlAudioSpec{};
 };
 
