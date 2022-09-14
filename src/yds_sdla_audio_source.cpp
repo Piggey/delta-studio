@@ -1,13 +1,19 @@
 #include "../include/yds_sdla_audio_source.h"
 
-ysSDLAAudioSource::ysSDLAAudioSource() {}
+#include "../include/yds_sdla_audio_buffer.h"
+
+ysSDLAAudioSource::ysSDLAAudioSource() : ysAudioSource(API::SDLAudio) {
+
+}
 
 ysSDLAAudioSource::~ysSDLAAudioSource() {
 
 }
 
 ysError ysSDLAAudioSource::LockEntireBuffer(void **buffer, SampleOffset *samples) {
-    return ysAudioSource::LockEntireBuffer(buffer, samples);
+    YDS_ERROR_DECLARE("LockEntireBuffer");
+    YDS_NESTED_ERROR_CALL(ysAudioSource::LockEntireBuffer(buffer, samples));
+
 }
 
 ysError ysSDLAAudioSource::UnlockBuffer(void *buffer, SampleOffset samples) {

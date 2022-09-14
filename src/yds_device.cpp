@@ -63,6 +63,9 @@ ysError ysDevice::CreateDevice(ysDevice **newDevice, DeviceAPI API) {
     case DeviceAPI::OpenGL4_0:
         *newDevice = new ysOpenGLDevice;
         break;
+    default:
+        *newDevice = nullptr;
+        break;
     }
 
     return YDS_ERROR_RETURN_STATIC(ysError::None);
