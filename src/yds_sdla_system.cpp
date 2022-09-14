@@ -2,14 +2,17 @@
 
 #include "../include/yds_sdla_device.h"
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 
 ysSDLASystem::ysSDLASystem() : ysAudioSystem(API::SDLAudio) {
-
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
+        fprintf(stderr, "Failed initializing audio.\n%s\n", SDL_GetError());
+    }
 }
 
 ysSDLASystem::~ysSDLASystem() {
-
+    SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
 void ysSDLASystem::EnumerateDevices() {
@@ -28,11 +31,11 @@ void ysSDLASystem::ConnectDevice(ysAudioDevice *device, ysWindow *windowAssociat
     ysAudioSystem::ConnectDevice(device, windowAssociation);
 
     auto *sdlaDevice = dynamic_cast<ysSDLADevice*>(device);
-    sdlaDevice->m_sdlaDevID = SDL_OpenAudioDevice(
+    sdlaDevice->m_sdlDeviceID = SDL_OpenAudioDevice(
             sdlaDevice->m_deviceName,
             0,
             &sdlaDevice->m_sdlAudioSpec,
-            &sdlaDevice->m_sdlAudioSpec,
+            &sdlaDevice->m_sdlAudioSpec, // BAD!
             SDL_AUDIO_ALLOW_FORMAT_CHANGE
     );
 }
@@ -45,5 +48,5 @@ void ysSDLASystem::DisconnectDevice(ysAudioDevice *device) {
     ysAudioSystem::DisconnectDevice(device);
 
     auto *sdlaDevice = dynamic_cast<ysSDLADevice*>(device);
-    SDL_CloseAudioDevice(sdlaDevice->m_sdlaDevID);
+    SDL_CloseAudioDevice(sdlaDevice->m_sdlDeviceID);
 }
