@@ -367,23 +367,23 @@ ysError dbasic::DeltaEngine::InitializeShaders(const char *shaderDirectory) {
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_saqPixelShader, buffer, "PS_SAQ"));
     }
     else if (m_device->GetAPI() == ysContextObject::DeviceAPI::OpenGL4_0) {
-        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_engine_shader.vert");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "glsl/delta_engine_shader.vert");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_vertexShader, buffer, "VS"));
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_vertexSkinnedShader, buffer, "VS"));
 
-        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_engine_shader.frag");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "glsl/delta_engine_shader.frag");
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_pixelShader, buffer, "PS"));
 
-        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_console_shader.vert");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "glsl/delta_console_shader.vert");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_consoleVertexShader, buffer, "VS"));
 
-        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_console_shader.frag");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "glsl/delta_console_shader.frag");
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_consolePixelShader, buffer, "PS"));
 
-        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_saq_shader.vert");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "glsl/delta_saq_shader.vert");
         YDS_NESTED_ERROR_CALL(m_device->CreateVertexShader(&m_saqVertexShader, buffer, "VS"));
 
-        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "/glsl/delta_saq_shader.frag");
+        sprintf_s(buffer, 256, "%s%s", shaderDirectory, "glsl/delta_saq_shader.frag");
         YDS_NESTED_ERROR_CALL(m_device->CreatePixelShader(&m_saqPixelShader, buffer, "PS"));
     }
 
