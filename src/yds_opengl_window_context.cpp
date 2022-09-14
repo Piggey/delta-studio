@@ -1,58 +1,37 @@
-#include "../include/yds_opengl_windows_context.h"
+#include "../include/yds_opengl_window_context.h"
 
 #include "../include/yds_opengl_device.h"
 #include "../include/yds_window.h"
+#include "../include/yds_unix_window.h"
 
 #include <SDL2/SDL.h>
 
-ysOpenGLWindowsContext::ysOpenGLWindowsContext(ysWindowSystemObject::Platform platform) : ysOpenGLVirtualContext(platform) {
+ysOpenGLWindowContext::ysOpenGLWindowContext(ysWindowSystemObject::Platform platform) : ysOpenGLVirtualContext(platform) {
     m_device = nullptr;
 }
 
-ysOpenGLWindowsContext::~ysOpenGLWindowsContext() {
+ysOpenGLWindowContext::~ysOpenGLWindowContext() {
     /* void */
 }
 
-ysError ysOpenGLWindowsContext::CreateRenderingContext(ysOpenGLDevice *device, ysWindow *window, int major, int minor) {
+ysError ysOpenGLWindowContext::CreateRenderingContext(ysOpenGLDevice *device, ysWindow *window, int major, int minor) {
     YDS_ERROR_DECLARE("CreateRenderingContext");
 
     if (window->GetPlatform() == ysWindowSystemObject::Platform::Unknown) {
         return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
     }
 
-    // init SDL
-    int init_result = SDL_Init(SDL_INIT_VIDEO);
-
-    if (init_result != 0) {
-        fprintf(stderr, "%s\n", SDL_GetError());
-    }
-
-    // set pixel stuff
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-    // create SDL window
-    m_window = SDL_CreateWindow(
-        window->GetTitle(),
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        window->GetWidth(),
-        window->GetHeight(),
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_MOUSE_CAPTURE
-    );
+    m_sdlWindow = dynamic_cast<ysUnixWindow*>(window)->GetSDLWindow();
 
     // generate context
-    *m_context = SDL_GL_CreateContext(m_window);
+    m_glContext = SDL_GL_CreateContext(m_sdlWindow);
 
-    if (m_context == nullptr) {
+    if (m_glContext == nullptr) {
         fprintf(stderr, "%s\n", SDL_GetError());
         return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
     }
 
-    if(SDL_GL_MakeCurrent(m_window, m_context) != 0) {
+    if(SDL_GL_MakeCurrent(m_sdlWindow, m_glContext) != 0) {
         fprintf(stderr, "%s\n", SDL_GetError());
         return YDS_ERROR_RETURN(ysError::CouldNotActivateTemporaryContext);
     }
@@ -68,23 +47,21 @@ ysError ysOpenGLWindowsContext::CreateRenderingContext(ysOpenGLDevice *device, y
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysOpenGLWindowsContext::DestroyContext() {
+ysError ysOpenGLWindowContext::DestroyContext() {
     YDS_ERROR_DECLARE("DestroyContext");
 
-    SDL_GL_DeleteContext(m_context);
-    SDL_DestroyWindow(m_window);
-
+    SDL_GL_DeleteContext(m_glContext);
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysOpenGLWindowsContext::TransferContext(ysOpenGLVirtualContext *context) {
+ysError ysOpenGLWindowContext::TransferContext(ysOpenGLVirtualContext *context) {
     YDS_ERROR_DECLARE("TransferContext");
 
     if (context->GetPlatform() == ysWindowSystemObject::Platform::Unknown) 
         return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
-    ysOpenGLWindowsContext *windowsContext = static_cast<ysOpenGLWindowsContext *>(context);
-    windowsContext->m_context = m_context;
+    auto *windowsContext = dynamic_cast<ysOpenGLWindowContext *>(context);
+    windowsContext->m_glContext = m_glContext;
     windowsContext->m_isRealContext = true;
 
     m_isRealContext = false;
@@ -92,31 +69,24 @@ ysError ysOpenGLWindowsContext::TransferContext(ysOpenGLVirtualContext *context)
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysOpenGLWindowsContext::SetContextMode(ContextMode mode) {
+ysError ysOpenGLWindowContext::SetContextMode(ContextMode mode) {
     YDS_ERROR_DECLARE("SetContextMode");
 
     ysWindow *window = GetWindow();
     ysMonitor *monitor = window->GetMonitor();
-    int result;
 
     if (mode == ysRenderingContext::ContextMode::Fullscreen) {
         window->SetWindowStyle(ysWindow::WindowStyle::Fullscreen);
 
-        SDL_DisplayMode mode;
-        mode.format = SDL_PIXELFORMAT_RGBA8888;
-        mode.h = monitor->GetPhysicalHeight();
-        mode.w = monitor->GetPhysicalWidth();
-        mode.refresh_rate = 0;
-        mode.driverdata = 0;
 
-        if (SDL_SetWindowDisplayMode(m_window, &mode) != 0) {
+        if (SDL_SetWindowFullscreen(m_sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0) {
             return YDS_ERROR_RETURN(ysError::CouldNotEnterFullscreen);
         }
     }
     else if (mode == ysRenderingContext::ContextMode::Windowed) {
         window->SetWindowStyle(ysWindow::WindowStyle::Windowed);
 
-        if (SDL_SetWindowDisplayMode(m_window, NULL) != 0) {
+        if (SDL_SetWindowFullscreen(m_sdlWindow, 0) != 0) {
             return YDS_ERROR_RETURN(ysError::CouldNotExitFullscreen);
         }
     }
@@ -124,17 +94,17 @@ ysError ysOpenGLWindowsContext::SetContextMode(ContextMode mode) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysOpenGLWindowsContext::SetContext(ysRenderingContext *realContext) {
+ysError ysOpenGLWindowContext::SetContext(ysRenderingContext *realContext) {
     YDS_ERROR_DECLARE("SetContext");
 
     if (realContext == nullptr) {
-        SDL_GL_MakeCurrent(NULL, NULL);
+        SDL_GL_MakeCurrent(nullptr, nullptr);
         return YDS_ERROR_RETURN(ysError::NoContext);
     }
 
-    ysOpenGLWindowsContext *realOpenglContext = static_cast<ysOpenGLWindowsContext *>(realContext);
+    auto *realOpenglContext = dynamic_cast<ysOpenGLWindowContext *>(realContext);
 
-    if (SDL_GL_MakeCurrent(m_window, realOpenglContext->m_context) != 0) {
+    if (SDL_GL_MakeCurrent(m_sdlWindow, realOpenglContext->m_glContext) != 0) {
         fprintf(stderr, "%s\n", SDL_GetError());
         return YDS_ERROR_RETURN(ysError::CouldNotActivateContext);
     }
@@ -142,15 +112,15 @@ ysError ysOpenGLWindowsContext::SetContext(ysRenderingContext *realContext) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysOpenGLWindowsContext::Present() {
+ysError ysOpenGLWindowContext::Present() {
     YDS_ERROR_DECLARE("Present");
 
-    SDL_GL_SwapWindow(m_window);
+    SDL_GL_SwapWindow(m_sdlWindow);
     return YDS_ERROR_RETURN(ysError::None);
 }
 
 
-void ysOpenGLWindowsContext::LoadAllExtensions() {
+void ysOpenGLWindowContext::LoadAllExtensions() {
     glGenBuffers = (PFNGLGENBUFFERSPROC)SDL_GL_GetProcAddress("glGenBuffers");
     glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)SDL_GL_GetProcAddress("glDeleteBuffers");
     glBindBuffer = (PFNGLBINDBUFFERPROC)SDL_GL_GetProcAddress("glBindBuffer");

@@ -5,10 +5,8 @@
 
 #include <SDL2/SDL.h>
 
-class ysUnixWindowSystem;
-
 class ysUnixWindow : public ysWindow {
-    friend ysUnixWindowSystem;
+    friend class ysUnixWindowSystem;
 
 public:
     ysUnixWindow();

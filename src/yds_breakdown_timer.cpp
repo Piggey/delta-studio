@@ -3,7 +3,7 @@
 #include "../include/yds_breakdown_timer_channel.h"
 #include "../include/yds_timing.h"
 
-#include <assert.h>
+#include <cassert>
 
 ysBreakdownTimer::ysBreakdownTimer() {
     m_frameCount = 0;

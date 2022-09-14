@@ -28,16 +28,12 @@ public:
     ysError Present() override;
 
 protected:
-    // HDC m_deviceHandle;
-    // HGLRC m_contextHandle;
-
     ysOpenGLDevice *m_device;
-    SDL_GLContext* m_context;
-    SDL_Window* m_window;
+    SDL_GLContext m_glContext;
+    SDL_Window* m_sdlWindow;
 
 protected:
     void LoadAllExtensions();
-    void LoadContextCreationExtension();
 };
 
 #endif /* YDS_OPENGL_WINDOWS_CONTEXT_H */

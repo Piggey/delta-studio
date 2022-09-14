@@ -2,7 +2,7 @@
 
 #include "../include/yds_timing.h"
 
-#include <assert.h>
+#include <cassert>
 
 ysBreakdownTimerChannel::ysBreakdownTimerChannel() {
     m_name = "";
@@ -15,7 +15,8 @@ ysBreakdownTimerChannel::ysBreakdownTimerChannel() {
 }
 
 ysBreakdownTimerChannel::~ysBreakdownTimerChannel() {
-    if (m_sampleBuffer != nullptr) Destroy();
+    if (m_sampleBuffer != nullptr)
+        Destroy();
 }
 
 void ysBreakdownTimerChannel::Initialize(int bufferSize) {
@@ -52,8 +53,10 @@ double ysBreakdownTimerChannel::GetSample(int i) const {
 }
 
 double ysBreakdownTimerChannel::GetLastSample() const {
-    if (m_entryCount == 0) return 0.0f;
-    else return GetSample(m_entryCount - 1);
+    if (m_entryCount == 0)
+        return 0.0f;
+    else
+        return GetSample(m_entryCount - 1);
 }
 
 void ysBreakdownTimerChannel::StartMeasurement(uint64_t timestamp) {

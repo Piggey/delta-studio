@@ -71,7 +71,7 @@ public:
         m_array[m_nObjects] = ysAllocator::TypeAllocate<TYPE, 1>();
 
         // Cast to a standard array element
-        ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
+        auto *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetAlignment(1);
         sElement->SetIndex(m_nObjects);
 
@@ -84,7 +84,7 @@ public:
         m_array[m_nObjects] = type;
 
         // Cast to a standard array element
-        ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
+        auto *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetIndex(m_nObjects);
 
         m_nObjects++;
@@ -101,7 +101,7 @@ public:
         m_array[offset] = type;
 
         // Cast to a standard array element
-        ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[offset]);
+        auto *sElement = static_cast<ysDynamicArrayElement *>(m_array[offset]);
         sElement->SetIndex(offset);
 
         m_nObjects++;
@@ -116,7 +116,7 @@ public:
         m_array[offset] = type;
 
         // Cast to a standard array element
-        ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[offset]);
+        auto *sElement = static_cast<ysDynamicArrayElement *>(m_array[offset]);
         sElement->SetIndex(offset);
     }
 
@@ -127,7 +127,7 @@ public:
         T_Create *newObject = ysAllocator::TypeAllocate<T_Create, Alignment>();
 
         // Cast to a standard array element
-        ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(newObject);
+        auto *sElement = static_cast<ysDynamicArrayElement *>(newObject);
         sElement->SetAlignment(Alignment);
         sElement->SetIndex(m_nObjects);
 
@@ -141,7 +141,7 @@ public:
 
         if (m_nObjects <= m_maxSize / 2) Condense();
 
-        ysDynamicArrayElement *target = static_cast<ysDynamicArrayElement *>(m_array[index]);
+        auto *target = static_cast<ysDynamicArrayElement *>(m_array[index]);
 
         if (destroy) {
             ysAllocator::TypeFree<TYPE>(m_array[index], 1, true, target->GetAlignment());
@@ -156,7 +156,7 @@ public:
                 for (int i = index; i < m_nObjects - 1; i++) {
                     m_array[i] = m_array[i + 1];
 
-                    ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[i]);
+                    auto *sElement = static_cast<ysDynamicArrayElement *>(m_array[i]);
                     sElement->SetIndex(i);
                 }
 
@@ -170,7 +170,7 @@ public:
 
         // Cast to a standard array element
         if (m_array[index]) {
-            ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[index]);
+            auto *sElement = static_cast<ysDynamicArrayElement *>(m_array[index]);
             sElement->SetIndex(index);
         }
 
