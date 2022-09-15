@@ -6,10 +6,8 @@
 #include "yds_keyboard.h"
 #include "yds_mouse.h"
 
-class ysInputSystem;
-
 class ysInputDevice : public ysWindowSystemObject {
-    friend ysInputSystem;
+    friend class ysInputSystem;
 
 public:
     static const int MAX_NAME_LENGTH = 256;
@@ -24,17 +22,17 @@ public:
 public:
     ysInputDevice();
     ysInputDevice(Platform platform, InputDeviceType type);
-    ~ysInputDevice();
+    ~ysInputDevice() override;
 
-    InputDeviceType GetType() const { return m_type; }
 
     void SetName(const char *name);
     const char *GetName() const { return m_name; }
 
     void SetType(InputDeviceType type);
+    InputDeviceType GetType() const { return m_type; }
 
-    int GetDeviceID() const { return m_deviceID; }
     void SetDeviceID(int deviceID) { m_deviceID = deviceID; }
+    int GetDeviceID() const { return m_deviceID; }
 
     void AttachDependency() { m_dependencyCount++; }
     void DetachDependency() { m_dependencyCount--; }
