@@ -373,7 +373,7 @@ const char ysKeyboard::CharMapUpper[] = {
 ysKeyboard::ysKeyboard() {
     m_inputBufferOffset = 0;
     m_inputBuffer[0] = '\0';
-    m_keyMap = 0;
+    m_keyMap = nullptr;
     m_keys = new ysKey[256];
 }
 
@@ -383,13 +383,16 @@ ysKeyboard::~ysKeyboard() {
 
 bool ysKeyboard::ProcessKeyTransition(ysKey::Code key, ysKey::State state) {
     if (m_keys[(int)key].m_state == state) {
-        if (state == ysKey::State::DownTransition) m_keys[(int)key].m_state = ysKey::State::Down;
-        if (state == ysKey::State::UpTransition) m_keys[(int)key].m_state = ysKey::State::Up;
+        if (state == ysKey::State::DownTransition)
+            m_keys[(int)key].m_state = ysKey::State::Down;
+
+        if (state == ysKey::State::UpTransition)
+            m_keys[(int)key].m_state = ysKey::State::Up;
 
         return true;
     }
 
-    else return false;
+    return false;
 }
 
 void ysKeyboard::ClearInputBuffer() {
@@ -403,7 +406,7 @@ void ysKeyboard::SetKeyState(ysKey::Code key, ysKey::State state, ysKey::Variati
 
     // Process the input buffer
     if (state == ysKey::State::DownTransition) {
-        const char *keyMap = nullptr;
+        const char *keyMap;
 
         if (IsKeyDown(ysKey::Code::Shift)) {
             keyMap = CharMapUpper;

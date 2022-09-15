@@ -152,7 +152,8 @@ void ysWindowSystem::SurveyMonitors() {
 ysError ysWindowSystem::AssignInputSystem(ysInputSystem *system) {
     YDS_ERROR_DECLARE("AssignInputSystem");
 
-    if (!CheckCompatibility(system)) return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
+    if (!CheckCompatibility(system))
+        return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
     system->AssignWindowSystem(this);
     m_inputSystem = system;

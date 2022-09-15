@@ -253,15 +253,12 @@ set(LINUX_SUPPORT_SOON_TM
 
 # platform specific libraries and stuff
 if(UNIX)
-    # find_package(OpenAL REQUIRED) # instead of DirectSound library
-
     # use system's OpenGL library
     if (POLICY CMP0072)
         cmake_policy(SET CMP0072 NEW)
     endif()
     find_package(OpenGL REQUIRED)
 
-    # DXVK replacement for D3D10?
     set(DELTA_CORE_SOURCE_FILES_LINUX
             include/yds_unix_defs.h
 

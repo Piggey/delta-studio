@@ -24,10 +24,8 @@ ysInputSystem::~ysInputSystem() {
 ysError ysInputSystem::CreateInputSystem(ysInputSystem **newInputSystem, Platform platform) {
     YDS_ERROR_DECLARE("CreateInputSystem");
 
-    if (newInputSystem == nullptr)
+    if (newInputSystem == nullptr || platform == Platform::Unknown)
         return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
-
-    if (platform == Platform::Unknown) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
     switch (platform) {
 #if defined(_MSC_VER)
@@ -36,7 +34,7 @@ ysError ysInputSystem::CreateInputSystem(ysInputSystem **newInputSystem, Platfor
         break;
 #elif defined(__GNUC__)
     case Platform::Linux:
-        *newInputSystem = new ysUnixInputSystem;
+        *newInputSystem = new ysUnixInputSystem();
         break;
 #endif
     default:
@@ -59,7 +57,8 @@ ysError ysInputSystem::DestroyInputSystem(ysInputSystem *&inputSystem) {
 ysError ysInputSystem::Initialize() {
     YDS_ERROR_DECLARE("Initialize");
 
-    if (m_windowSystem == nullptr) return YDS_ERROR_RETURN(ysError::NoWindowSystem);
+    if (m_windowSystem == nullptr)
+        return YDS_ERROR_RETURN(ysError::NoWindowSystem);
 
     YDS_NESTED_ERROR_CALL(CreateDevices());
 
@@ -177,5 +176,5 @@ ysInputDevice *ysInputSystem::FindGenericSlot(ysInputDevice::InputDeviceType typ
     }
 
     // No generic slot
-    return 0;
+    return nullptr;
 }

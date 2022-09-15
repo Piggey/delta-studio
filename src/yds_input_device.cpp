@@ -1,7 +1,5 @@
 #include "../include/yds_input_device.h"
 
-#include "../../../include/yds_unix_defs.h"
-
 ysInputDevice::ysInputDevice() : ysWindowSystemObject("INPUT DEVICE", Platform::Unknown) {
     SetName("");
 
@@ -46,7 +44,7 @@ void ysInputDevice::Destroy() {
     }
 
     // Clear specific pointer
-    m_generic = 0;
+    m_generic = false;
 }
 
 void ysInputDevice::SetName(const char *name) {
@@ -54,7 +52,9 @@ void ysInputDevice::SetName(const char *name) {
 }
 
 void ysInputDevice::SetType(ysInputDevice::InputDeviceType type) {
-    if (m_type != type) Destroy();
+    if (m_type != type)
+        Destroy();
+
     m_type = type;
 
     if (m_type == InputDeviceType::KEYBOARD) {

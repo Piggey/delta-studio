@@ -61,7 +61,7 @@ ysError ysDevice::CreateDevice(ysDevice **newDevice, DeviceAPI API) {
         break;
 #endif
     case DeviceAPI::OpenGL4_0:
-        *newDevice = new ysOpenGLDevice;
+        *newDevice = new ysOpenGLDevice();
         break;
     default:
         *newDevice = nullptr;
