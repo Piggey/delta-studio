@@ -19,7 +19,7 @@ public:
 
     ysWindow *FindWindowFromHandle(HWND handle);
 
-    virtual void ConnectInstance(void *genericInstanceConnection);
+    void ConnectInstance(void *genericInstanceConnection) override;
 
     static LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

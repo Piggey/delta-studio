@@ -102,13 +102,13 @@ ysError dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings
     YDS_NESTED_ERROR_CALL(ysWindowSystem::CreateWindowSystem(&m_windowSystem, settings.platform));
 
     // windows specific, not sure why its here
-    /* m_windowSystem->ConnectInstance(settings.Instance); */
+    m_windowSystem->ConnectInstance(settings.Instance);
 
     // Find the monitor setup
     m_windowSystem->SurveyMonitors();
     ysMonitor *mainMonitor = m_windowSystem->GetPrimaryMonitor();
 
-    // Create the game window
+    // init the game window
     YDS_NESTED_ERROR_CALL(m_windowSystem->NewWindow(&m_gameWindow));
     YDS_NESTED_ERROR_CALL(
             m_gameWindow->InitializeWindow(
@@ -117,7 +117,7 @@ ysError dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings
                 settings.WindowStyle,
                 settings.WindowPositionX, settings.WindowPositionY,
                 settings.WindowWidth, settings.WindowHeight,
-                mainMonitor
+                settings.API, mainMonitor
             )
     );
     m_gameWindow->AttachEventHandler(&m_windowHandler);

@@ -57,6 +57,9 @@ public:
     ysError AssignInputSystem(ysInputSystem *system);
     ysInputSystem *GetInputSystem() { return m_inputSystem; }
 
+    // ms windows bullshit
+    virtual void ConnectInstance(void *genericInstanceConnection) = 0;
+
 protected:
     ysDynamicArray<ysMonitor, 4> m_monitorArray;
     ysDynamicArray<ysWindow, 4> m_windowArray;

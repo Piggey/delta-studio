@@ -20,6 +20,9 @@ public:
     void ConfineCursor(const ysWindow *window) override;
     void ReleaseCursor(const ysWindow *window) override;
     void SetCursorVisible(bool visible) override;
+
+    // empty function to keep compatibility
+    void ConnectInstance(void *genericInstanceConnection) override { /* void */ }
 };
 
 
