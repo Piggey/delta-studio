@@ -8,23 +8,39 @@ ysUnixWindow::~ysUnixWindow() {
     SDL_DestroyWindow(m_sdlWindow);
 }
 
-ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWindow::WindowStyle style,
-                                       int x, int y, int width, int height, ysMonitor *monitor) {
+ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWindow::WindowStyle style, int x, int y,
+                                       int width, int height, ysContextObject::DeviceAPI api, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
 
     if (!CheckCompatibility(parent))
         return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
-    YDS_NESTED_ERROR_CALL(ysWindow::InitializeWindow(parent, title, style, x, y, width, height, monitor));
+    YDS_NESTED_ERROR_CALL(ysWindow::InitializeWindow(parent, title, style, x, y, width, height, api, monitor));
+
+    int flags = SDL_WINDOW_SHOWN;
+    switch (api) {
+        case ysContextObject::DeviceAPI::OpenGL4_0:
+            flags |= SDL_WINDOW_OPENGL;
+            break;
+        case ysContextObject::DeviceAPI::Vulkan:
+            flags |= SDL_WINDOW_VULKAN;
+            break;
+        case ysContextObject::DeviceAPI::Unknown:
+        default:
+            break;
+    }
 
     // SDL2 should be initialized by now
     // actually create a window
     m_sdlWindow = SDL_CreateWindow(
             title,
-            x, y,
+            x + monitor->GetOriginX(),
+            y + monitor->GetOriginY(),
             width, height,
-            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
+            flags
     );
+
+    SetState(WindowState::Visible);
 
     if (m_sdlWindow == nullptr) {
         return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
@@ -33,8 +49,8 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWi
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title,
-                                       ysWindow::WindowStyle style,ysMonitor *monitor) {
+ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title, ysWindow::WindowStyle style,
+                                       ysContextObject::DeviceAPI api, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
     YDS_NESTED_ERROR_CALL(
             InitializeWindow(
@@ -45,11 +61,12 @@ ysError ysUnixWindow::InitializeWindow(ysWindow *parent, const char *title,
                 monitor->GetOriginY(),
                 monitor->GetPhysicalWidth(),
                 monitor->GetPhysicalHeight(),
+                api,
                 monitor
             )
     );
 
-    YDS_ERROR_RETURN(ysError::None);
+    return YDS_ERROR_RETURN(ysError::None);
 }
 
 bool ysUnixWindow::SetWindowStyle(ysWindow::WindowStyle style) {

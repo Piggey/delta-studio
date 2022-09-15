@@ -30,6 +30,7 @@ void delta_demo::EmptyWindowDemo::Initialize(void *instance, ysContextObject::De
         nullptr,
         "01-Empty Window Demo",
         ysWindow::WindowStyle::Windowed,
+        api,
         mainMonitor);
     if (result != ysError::None) return;
 

@@ -57,7 +57,8 @@ ysWindow::~ysWindow() {
     /* void */
 }
 
-ysError ysWindow::InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor) {
+ysError ysWindow::InitializeWindow(ysWindow *parent, const char *title, ysWindow::WindowStyle style, int x, int y,
+                                   int width, int height, ysContextObject::DeviceAPI api, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
 
     m_width = width;
@@ -72,18 +73,23 @@ ysError ysWindow::InitializeWindow(ysWindow *parent, const char *title, WindowSt
     m_windowStyle = style;
 
     m_monitor = monitor;
+    m_api = api;
 
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysWindow::InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, ysMonitor *monitor) {
+ysError ysWindow::InitializeWindow(ysWindow *parent, const char *title, ysWindow::WindowStyle style,
+                                   ysContextObject::DeviceAPI api, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
 
     YDS_NESTED_ERROR_CALL(
-        InitializeWindow(
-            parent, title, style,
-            monitor->GetOriginX(), monitor->GetOriginY(),
-            monitor->GetPhysicalWidth(), monitor->GetPhysicalHeight(), monitor));
+            InitializeWindow(
+                    parent, title, style,
+                    monitor->GetOriginX(), monitor->GetOriginY(),
+                    monitor->GetPhysicalWidth(), monitor->GetPhysicalHeight(),
+                    api, monitor
+            )
+    );
 
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -91,15 +97,15 @@ ysError ysWindow::InitializeWindow(ysWindow *parent, const char *title, WindowSt
 void ysWindow::RestoreWindow() {
     WindowState prevWindowState = m_windowState;
 
-    InitializeWindow(m_parent, m_title, m_windowStyle, m_locationx, m_locationy, m_width, m_height, m_monitor);
+    InitializeWindow(m_parent, m_title, m_windowStyle, m_locationx, m_locationy, m_width, m_height, m_api, m_monitor);
     SetState(prevWindowState);
 }
 
-const int ysWindow::GetGameWidth() const {
+int ysWindow::GetGameWidth() const {
     return std::round(m_gameResolutionScaleHorizontal * GetScreenWidth());
 }
 
-const int ysWindow::GetGameHeight() const {
+int ysWindow::GetGameHeight() const {
     return std::round(m_gameResolutionScaleVertical * GetScreenHeight());
 }
 
@@ -161,8 +167,11 @@ bool ysWindow::SetWindowStyle(WindowStyle style) {
 // Handlers
 
 void ysWindow::AttachEventHandler(ysWindowEventHandler *handler) {
-    if (m_eventHandler) m_eventHandler->m_window = NULL;
-    if (handler) handler->m_window = this;
+    if (m_eventHandler)
+        m_eventHandler->m_window = nullptr;
+
+    if (handler)
+        handler->m_window = this;
 
     m_eventHandler = handler;
 }

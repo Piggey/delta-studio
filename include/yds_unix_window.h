@@ -12,8 +12,8 @@ public:
     ysUnixWindow();
     ~ysUnixWindow() override;
 
-    ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor) override;
-    ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, ysMonitor *monitor) override;
+    ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, int x, int y, int width, int height, ysContextObject::DeviceAPI api, ysMonitor *monitor) override;
+    ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, ysContextObject::DeviceAPI api, ysMonitor *monitor) override;
 
     bool SetWindowStyle(WindowStyle style) override;
 
@@ -27,6 +27,7 @@ public:
 
 private:
     SDL_Window* m_sdlWindow = nullptr;
+
 };
 
 

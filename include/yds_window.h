@@ -3,9 +3,11 @@
 
 #include "yds_window_system_object.h"
 #include "yds_monitor.h"
+#include "yds_context_object.h"
 
 class ysWindowEventHandler;
 class ysWindowSystem;
+class GameEngineSettings;
 
 class ysWindow : public ysWindowSystemObject {
 public:
@@ -33,8 +35,8 @@ public:
     virtual ~ysWindow();
 
     /* Interface */
-    virtual ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor);
-    virtual ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, ysMonitor *monitor);
+    virtual ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, int x, int y, int width, int height, ysContextObject::DeviceAPI api, ysMonitor *monitor);
+    virtual ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, ysContextObject::DeviceAPI api, ysMonitor *monitor);
 
     virtual void Close() { SetState(WindowState::Closed); }
     virtual void SetState(WindowState state = WindowState::Visible) { m_windowState = state; }
@@ -49,8 +51,8 @@ public:
     WindowStyle GetWindowStyle() const { return m_windowStyle; }
     ysMonitor *GetMonitor() const { return m_monitor; }
 
-    const int GetGameWidth() const;
-    const int GetGameHeight() const;
+    int GetGameWidth() const;
+    int GetGameHeight() const;
 
     int GetPositionX() const { return m_locationx; }
     int GetPositionY() const { return m_locationy; }
@@ -113,13 +115,16 @@ protected:
     int m_locationy;
 
     // Title
-    char m_title[MAX_NAME_LENGTH];
+    char m_title[MAX_NAME_LENGTH]{};
 
     // Current Window State
     WindowState m_windowState;
 
     // Window Style
     WindowStyle m_windowStyle;
+
+    // Graphics API used
+    ysContextObject::DeviceAPI m_api;
 
     // Parent Window
     ysWindow *m_parent;
