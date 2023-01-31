@@ -3,6 +3,8 @@
 
 #include "yds_context_object.h"
 
+#include <string>
+
 class ysTexture : public ysContextObject {
     friend class ysDevice;
 
@@ -14,7 +16,7 @@ public:
     ysTexture(DeviceAPI API);
     virtual ~ysTexture();
 
-    const char *GetFilename() { return m_filename; }
+    std::string GetFilename() const { return m_filename; }
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
 
@@ -22,7 +24,7 @@ protected:
     int m_width;
     int m_height;
 
-    char m_filename[MAX_FILENAME_LENGTH + 1];
+    std::string m_filename;
 };
 
 #endif /* YDS_TEXTURE_H */

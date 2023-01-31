@@ -252,8 +252,8 @@ ysError ysVulkanDevice::CreateAlphaTexture(ysTexture **texture, int width, int h
     if (texture == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     *texture = nullptr;
 
-    ysVulkanTexture *newTexture = m_textures.NewGeneric<ysVulkanTexture>();
-    strcpy_s(newTexture->m_filename, 257, "");
+    auto *newTexture = m_textures.NewGeneric<ysVulkanTexture>();
+    newTexture->m_filename = "";
     newTexture->m_width = width;
     newTexture->m_height = height;
 
@@ -281,13 +281,15 @@ ysError ysVulkanDevice::CreateVulkanInstance() {
     YDS_ERROR_DECLARE("CreateVulkanInstance");
 
     const char *extensions[] = {
-    VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-    VK_KHR_SURFACE_EXTENSION_NAME
+#ifdef _WIN32
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#endif
+        VK_KHR_SURFACE_EXTENSION_NAME
     };
 
     VkApplicationInfo appInfo = {};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pNext = NULL;
+    appInfo.pNext = nullptr;
     appInfo.pApplicationName = "";
     appInfo.applicationVersion = 1;
     appInfo.pEngineName = "Delta Studio";
