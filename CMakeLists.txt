@@ -11,7 +11,7 @@ project(delta-studio)
 # Graphics APIs
 option(ENABLE_OPENGL "Enable the OpenGL graphics API" ON)
 cmake_dependent_option(ENABLE_D3D "Enable the Direct3D 10/11 graphics API" ON WIN32 OFF)
-cmake_dependent_option(ENABLE_VULKAN "Enable the Vulkan graphics API" ON WIN32 OFF) # TODO: make Vulkan work outside of Win32
+cmake_dependent_option(ENABLE_VULKAN "Enable the Vulkan graphics API" ON WIN32 ON) # TODO: make Vulkan work outside of Win32
 
 # Sound Systems
 cmake_dependent_option(ENABLE_DSOUND "Enable the DirectSound API" ON WIN32 OFF)
@@ -369,7 +369,6 @@ if (ENABLE_VULKAN)
         src/yds_vulkan_shader.cpp
         src/yds_vulkan_shader_program.cpp
         src/yds_vulkan_texture.cpp
-        src/yds_vulkan_windows_context.cpp
 
         # Include files
         include/yds_vulkan.h
@@ -382,7 +381,6 @@ if (ENABLE_VULKAN)
         include/yds_vulkan_shader.h
         include/yds_vulkan_shader_program.h
         include/yds_vulkan_texture.h
-        include/yds_vulkan_windows_context.h
     )
 
     target_include_directories(delta-core PRIVATE dependencies/libraries/vulkan/include)
@@ -425,6 +423,13 @@ if (ENABLE_PLAT_WIN32)
         )
     endif()
 
+    if (ENABLE_VULKAN)
+        target_sources(delta-core PRIVATE
+            src/yds_vulkan_windows_context.cpp
+            include/yds_vulkan_windows_context.h
+        )
+    endif()
+
     target_link_libraries(delta-core PRIVATE
         winmm
     )
@@ -460,6 +465,13 @@ if (ENABLE_PLAT_SDL)
         target_sources(delta-core PRIVATE
             src/yds_opengl_sdl_context.cpp
             include/yds_opengl_sdl_context.h
+        )
+    endif()
+
+    if (ENABLE_VULKAN)
+        target_sources(delta-core PRIVATE
+            src/yds_vulkan_sdl_context.cpp
+            include/yds_vulkan_sdl_context.h
         )
     endif()
 endif()

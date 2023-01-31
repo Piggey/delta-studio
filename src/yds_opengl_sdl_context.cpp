@@ -19,7 +19,7 @@ ysError ysOpenGLSdlContext::CreateRenderingContext(ysOpenGLDevice *device, ysWin
         return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
     }
 
-    ysSdlWindow *sdlWindow = static_cast<ysSdlWindow *>(window);
+    ysSdlWindow *sdlWindow = dynamic_cast<ysSdlWindow *>(window);
 
     // TODO: more options here to match Windows impl
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
